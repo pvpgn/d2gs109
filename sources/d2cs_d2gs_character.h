@@ -21,7 +21,7 @@ typedef struct
 	bn_int		create_time;	/* character creation time */
 	bn_int		last_time;		/* character last access time */
 	bn_int		checksum;
-	bn_int		reserved[7];                             
+	bn_int		reserved[7];
 	unsigned char	charname[MAX_CHARNAME_LEN];
 	unsigned char	account[MAX_ACCTNAME_LEN];
 	unsigned char	realmname[MAX_REALMNAME_LEN];
@@ -37,15 +37,15 @@ typedef struct
 
 typedef struct
 {
-        bn_short        header;	/* 0x84 0x80 */
-        bn_byte         gfx[11];
-        bn_byte         class;
-        bn_byte         color[11];
-        bn_byte         level;
-        bn_byte         status;
-        bn_byte         u1[3];
-        bn_byte         u2[3];
-        bn_byte         end;	/* 0x00 */
+	bn_short        header;	/* 0x84 0x80 */
+	bn_byte         gfx[11];
+	bn_byte         class;
+	bn_byte         color[11];
+	bn_byte         level;
+	bn_byte         status;
+	bn_byte         u1[3];
+	bn_byte         u2[3];
+	bn_byte         end;	/* 0x00 */
 } t_d2charinfo_portrait;
 
 typedef struct

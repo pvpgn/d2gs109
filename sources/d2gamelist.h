@@ -11,7 +11,7 @@
 #include "bn_types.h"
 #include "list.h"
 
-/* structures */
+ /* structures */
 typedef struct RAW_D2CHARINFO {
 	bn_char		AcctName[MAX_ACCTNAME_LEN];	/* account name */
 	bn_char		CharName[MAX_CHARNAME_LEN];	/* char name */
@@ -72,13 +72,13 @@ int  D2GSGetCurrentGameNumber(void);
 int  D2GSGetCurrentGameStatistic(DWORD *gamenum, DWORD *usernum);
 void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo);
 int  D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
-						UCHAR difficulty, UCHAR hardcore, WORD wGameId);
+	UCHAR difficulty, UCHAR hardcore, WORD wGameId);
 int  D2GSGameListDelete(D2GAMEINFO *lpGameInfo);
 int  D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, DWORD CharLevel, WORD CharClass, WORD EnterGame);
+	UCHAR *CharName, DWORD CharLevel, WORD CharClass, WORD EnterGame);
 int  D2GSDeleteCharFromGameInfo(D2GAMEINFO *lpGameInfo, D2CHARINFO *lpCharInfo);
 int  D2GSInsertCharIntoPendingList(DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame);
+	UCHAR *CharName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame);
 int  D2GSDeletePendingChar(D2CHARINFO *lpCharInfo);
 int  D2GSInsertGetDataRequest(UCHAR *AcctName, UCHAR *CharName, DWORD dwClientId, DWORD dwSeqno);
 int  D2GSDeleteGetDataRequest(D2GETDATAREQUEST *lpGetDataReq);

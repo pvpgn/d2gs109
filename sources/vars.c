@@ -14,8 +14,8 @@
 #include "charlist.h"
 
 
-/*===================================================================*/
-/* global variables */
+ /*===================================================================*/
+ /* global variables */
 D2GSCONFIGS			d2gsconf;
 BOOL				bGERunning;
 CRITICAL_SECTION	csGameList;
@@ -46,7 +46,7 @@ int D2GSVarsInitialize(void)
 	d2gsconf.checksum = val;
 
 	/* initialize char list table */
-	if (charlist_init(DEFAULT_HASHTBL_LEN)!=0) {
+	if (charlist_init(DEFAULT_HASHTBL_LEN) != 0) {
 		D2GSEventLog("D2GSVarsInitialize", "Failed initialize charlist table");
 		return FALSE;
 	}
@@ -56,7 +56,8 @@ int D2GSVarsInitialize(void)
 
 	if (CleanupRoutineInsert(CleanupRoutineForVars, "Global Variables")) {
 		return TRUE;
-	} else {
+	}
+	else {
 		/* do some cleanup before quiting */
 		CleanupRoutineForVars();
 		return FALSE;

@@ -52,7 +52,7 @@ int D2GEStartup(void)
 		return FALSE;
 	}
 	dwWait = WaitForSingleObject(hEvent, D2GE_INIT_TIMEOUT);
-	if (dwWait!=WAIT_OBJECT_0) {
+	if (dwWait != WAIT_OBJECT_0) {
 		CloseHandle(hEvent);
 		return FALSE;
 	}
@@ -61,7 +61,8 @@ int D2GEStartup(void)
 
 	if (CleanupRoutineInsert(D2GECleanup, "Diablo II Game Engine")) {
 		return TRUE;
-	} else {
+	}
+	else {
 		/* do some cleanup before quiting */
 		D2GECleanup();
 		return FALSE;
@@ -100,17 +101,17 @@ int D2GEThreadInit(void)
 		return FALSE;
 	}
 
-	gD2GSInfo.szVersion				= D2GS_VERSION_STRING;
-	gD2GSInfo.dwLibVersion			= D2GS_LIBRARY_VERSION;
-	gD2GSInfo.bIsNT					= d2gsconf.enablentmode;
-	gD2GSInfo.bEnablePatch			= d2gsconf.enablegepatch;
-	gD2GSInfo.fpEventLog			= D2GEEventLog;
-	gD2GSInfo.fpErrorHandle			= D2GSErrorHandle;
-	gD2GSInfo.fpCallback			= EventCallbackTableInit();
-	gD2GSInfo.bPreCache				= d2gsconf.enableprecachemode;
-	gD2GSInfo.dwIdleSleep			= d2gsconf.idlesleep;
-	gD2GSInfo.dwBusySleep			= d2gsconf.busysleep;
-	gD2GSInfo.dwMaxGame				= d2gsconf.gemaxgames;
+	gD2GSInfo.szVersion = D2GS_VERSION_STRING;
+	gD2GSInfo.dwLibVersion = D2GS_LIBRARY_VERSION;
+	gD2GSInfo.bIsNT = d2gsconf.enablentmode;
+	gD2GSInfo.bEnablePatch = d2gsconf.enablegepatch;
+	gD2GSInfo.fpEventLog = D2GEEventLog;
+	gD2GSInfo.fpErrorHandle = D2GSErrorHandle;
+	gD2GSInfo.fpCallback = EventCallbackTableInit();
+	gD2GSInfo.bPreCache = d2gsconf.enableprecachemode;
+	gD2GSInfo.dwIdleSleep = d2gsconf.idlesleep;
+	gD2GSInfo.dwBusySleep = d2gsconf.busysleep;
+	gD2GSInfo.dwMaxGame = d2gsconf.gemaxgames;
 	gD2GSInfo.dwProcessAffinityMask = d2gsconf.multicpumask;
 	return TRUE;
 
@@ -128,12 +129,12 @@ static BOOL D2GSGetInterface(void)
 	lpD2GSInterface = QueryInterface();
 	if (!lpD2GSInterface) return FALSE;
 
-	D2GSStart					= lpD2GSInterface->D2GSStart;
-	D2GSSendDatabaseCharacter	= lpD2GSInterface->D2GSSendDatabaseCharacter;
-	D2GSRemoveClientFromGame	= lpD2GSInterface->D2GSRemoveClientFromGame;
-	D2GSNewEmptyGame			= lpD2GSInterface->D2GSNewEmptyGame;
-	D2GSEndAllGames				= lpD2GSInterface->D2GSEndAllGames;
-	D2GSSendClientChatMessage	= lpD2GSInterface->D2GSSendClientChatMessage;
+	D2GSStart = lpD2GSInterface->D2GSStart;
+	D2GSSendDatabaseCharacter = lpD2GSInterface->D2GSSendDatabaseCharacter;
+	D2GSRemoveClientFromGame = lpD2GSInterface->D2GSRemoveClientFromGame;
+	D2GSNewEmptyGame = lpD2GSInterface->D2GSNewEmptyGame;
+	D2GSEndAllGames = lpD2GSInterface->D2GSEndAllGames;
+	D2GSSendClientChatMessage = lpD2GSInterface->D2GSSendClientChatMessage;
 
 	return TRUE;
 
@@ -191,26 +192,31 @@ DWORD WINAPI D2GEThread(LPVOID lpParameter)
 		CloseHandle(hObjects[0]);
 		SetEvent(hEvent);
 		return FALSE;
-	} else {
+	}
+	else {
 		D2GSEventLog("D2GEThread", "Server Thread %lu Created", dwThreadId);
 	}
 	dwRetval = WaitForMultipleObjects(NELEMS(hObjects), hObjects, FALSE, D2GE_INIT_TIMEOUT);
 
-	if (dwRetval==WAIT_FAILED) {
+	if (dwRetval == WAIT_FAILED) {
 		D2GSEventLog("D2GEThread", "Wait Server Thread Failed. Code: %lu", GetLastError());
 		SetEvent(hEvent);
-	} else if (dwRetval==WAIT_TIMEOUT) {
+	}
+	else if (dwRetval == WAIT_TIMEOUT) {
 		D2GSEventLog("D2GEThread", "Game Server Thread Timedout");
 		SetEvent(hEvent);
-	} else if (dwRetval==WAIT_OBJECT_0 + 1) {
+	}
+	else if (dwRetval == WAIT_OBJECT_0 + 1) {
 		GetExitCodeThread(hObjects[1], &dwExitCode);
-		D2GSEventLog("D2GEThread", "Game Server Thread Exit with %d", dwExitCode); 
+		D2GSEventLog("D2GEThread", "Game Server Thread Exit with %d", dwExitCode);
 		SetEvent(hEvent);
-	} else if (dwRetval==WAIT_OBJECT_0) {
+	}
+	else if (dwRetval == WAIT_OBJECT_0) {
 		D2GSEventLog("D2GEThread", "Game Server Thread Start Successfully");
 		SetEvent(hEvent);
 		bGERunning = TRUE;
-	} else {
+	}
+	else {
 		D2GSEventLog("D2GEThread", "Wait Server Thread Returned %d", dwRetval);
 		SetEvent(hEvent);
 	}

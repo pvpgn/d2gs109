@@ -33,7 +33,7 @@ int D2GSReadConfig(void)
 		goto tocloseregkey;
 	}
 	ipaddr = inet_addr(strbuf);
-	if (ipaddr==INADDR_NONE) {
+	if (ipaddr == INADDR_NONE) {
 		D2GSEventLog("D2GSReadConfig", "Invalid D2CSIP '%s'", strbuf);
 		goto tocloseregkey;
 	}
@@ -45,7 +45,7 @@ int D2GSReadConfig(void)
 		goto tocloseregkey;
 	}
 	ipaddr = inet_addr(strbuf);
-	if (ipaddr==INADDR_NONE) {
+	if (ipaddr == INADDR_NONE) {
 		D2GSEventLog("D2GSReadConfig", "Invalid D2DBSIP '%s'", strbuf);
 		goto tocloseregkey;
 	}
@@ -54,174 +54,195 @@ int D2GSReadConfig(void)
 	/* D2CSPORT */
 	if (!RegkeyReadDWORD(hKey, REGKEY_D2CSPORT, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_D2CSPORT, DEFAULT_D2CS_PORT);
+			REGKEY_D2CSPORT, DEFAULT_D2CS_PORT);
 		d2gsconf.d2csport = DEFAULT_D2CS_PORT;
-	} else
+	}
+	else
 		d2gsconf.d2csport = htons((u_short)dwval);
 
 	/* D2DBSPORT */
 	if (!RegkeyReadDWORD(hKey, REGKEY_D2DBSPORT, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_D2DBSPORT, DEFAULT_D2DBS_PORT);
+			REGKEY_D2DBSPORT, DEFAULT_D2DBS_PORT);
 		d2gsconf.d2csport = DEFAULT_D2DBS_PORT;
-	} else
+	}
+	else
 		d2gsconf.d2dbsport = htons((short)dwval);
 
 	/* MAXGAMES */
 	if (!RegkeyReadDWORD(hKey, REGKEY_MAXGAMES, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_MAXGAMES, DEFAULT_MAX_GAMES);
+			REGKEY_MAXGAMES, DEFAULT_MAX_GAMES);
 		d2gsconf.gsmaxgames = DEFAULT_MAX_GAMES;
-	} else
+	}
+	else
 		d2gsconf.gsmaxgames = dwval;
-	d2gsconf.gemaxgames = d2gsconf.gsmaxgames*2+100;
+	d2gsconf.gemaxgames = d2gsconf.gsmaxgames * 2 + 100;
 
 	/* ENABLENTMODE */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ENABLENTMODE, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ENABLENTMODE, DEFAULT_NT_MODE);
+			REGKEY_ENABLENTMODE, DEFAULT_NT_MODE);
 		d2gsconf.enablentmode = DEFAULT_NT_MODE;
-	} else
+	}
+	else
 		d2gsconf.enablentmode = (BOOL)dwval;
 
 	/* ENABLEGEPATCH */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ENABLEGEPATCH, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ENABLEGEPATCH, DEFAULT_GE_PATCH);
+			REGKEY_ENABLEGEPATCH, DEFAULT_GE_PATCH);
 		d2gsconf.enablegepatch = DEFAULT_GE_PATCH;
-	} else
+	}
+	else
 		d2gsconf.enablegepatch = (BOOL)dwval;
 
 	/* ENABLEPRECACHEMODE */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ENABLEPRECACHEMODE, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ENABLEPRECACHEMODE, DEFAULT_PRECACHE_MODE);
+			REGKEY_ENABLEPRECACHEMODE, DEFAULT_PRECACHE_MODE);
 		d2gsconf.enableprecachemode = DEFAULT_PRECACHE_MODE;
-	} else
+	}
+	else
 		d2gsconf.enableprecachemode = (BOOL)dwval;
 
 	/* ENABLEGELOG */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ENABLEGELOG, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ENABLEGELOG, DEFAULT_GE_LOG);
+			REGKEY_ENABLEGELOG, DEFAULT_GE_LOG);
 		d2gsconf.enablegelog = DEFAULT_GE_LOG;
-	} else
+	}
+	else
 		d2gsconf.enablegelog = (BOOL)dwval;
 
 	/* ENABLEGEMSG */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ENABLEGEMSG, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ENABLEGEMSG, DEFAULT_GE_MSG);
+			REGKEY_ENABLEGEMSG, DEFAULT_GE_MSG);
 		d2gsconf.enablegemsg = DEFAULT_GE_MSG;
-	} else
+	}
+	else
 		d2gsconf.enablegemsg = (BOOL)dwval;
 
 	/* DEBUGNETPACKET */
 	if (!RegkeyReadDWORD(hKey, REGKEY_DEBUGNETPACKET, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_DEBUGNETPACKET, DEFAULT_DEBUGNETPACKET);
+			REGKEY_DEBUGNETPACKET, DEFAULT_DEBUGNETPACKET);
 		d2gsconf.debugnetpacket = DEFAULT_DEBUGNETPACKET;
-	} else
+	}
+	else
 		d2gsconf.debugnetpacket = (BOOL)dwval;
 
 	/* DEBUGEVENTCALLBACK */
 	if (!RegkeyReadDWORD(hKey, REGKEY_DEBUGEVENTCALLBACK, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_DEBUGEVENTCALLBACK, DEFAULT_DEBUGEVENTCALLBACK);
+			REGKEY_DEBUGEVENTCALLBACK, DEFAULT_DEBUGEVENTCALLBACK);
 		d2gsconf.debugeventcallback = DEFAULT_DEBUGEVENTCALLBACK;
-	} else
+	}
+	else
 		d2gsconf.debugeventcallback = (BOOL)dwval;
 
 	/* IDLESLEEP */
 	if (!RegkeyReadDWORD(hKey, REGKEY_IDLESLEEP, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_IDLESLEEP, DEFAULT_IDLE_SLEEP);
+			REGKEY_IDLESLEEP, DEFAULT_IDLE_SLEEP);
 		d2gsconf.idlesleep = DEFAULT_IDLE_SLEEP;
-	} else
+	}
+	else
 		d2gsconf.idlesleep = dwval;
 
 	/* BUSYSLEEP */
 	if (!RegkeyReadDWORD(hKey, REGKEY_BUSYSLEEP, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_BUSYSLEEP, DEFAULT_BUSY_SLEEP);
+			REGKEY_BUSYSLEEP, DEFAULT_BUSY_SLEEP);
 		d2gsconf.busysleep = DEFAULT_BUSY_SLEEP;
-	} else
+	}
+	else
 		d2gsconf.busysleep = dwval;
 
 	/* CHARPENDINGTIMEOUT */
 	if (!RegkeyReadDWORD(hKey, REGKEY_CHARPENDINGTIMEOUT, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_CHARPENDINGTIMEOUT, DEFAULT_CHARPENDINGTIMEOUT);
+			REGKEY_CHARPENDINGTIMEOUT, DEFAULT_CHARPENDINGTIMEOUT);
 		d2gsconf.charpendingtimeout = DEFAULT_CHARPENDINGTIMEOUT;
-	} else
+	}
+	else
 		d2gsconf.charpendingtimeout = dwval;
 
 	/* INTERVALRECONNECTD2CS */
 	if (!RegkeyReadDWORD(hKey, REGKEY_INTERVALRECONNECTD2CS, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_INTERVALRECONNECTD2CS, DEFAULT_INTERVALRECONNECTD2CS);
+			REGKEY_INTERVALRECONNECTD2CS, DEFAULT_INTERVALRECONNECTD2CS);
 		d2gsconf.intervalreconnectd2cs = DEFAULT_INTERVALRECONNECTD2CS;
-	} else
+	}
+	else
 		d2gsconf.intervalreconnectd2cs = dwval;
 
 	/* ADMINPWD */
 	ZeroMemory(d2gsconf.adminpwd, sizeof(d2gsconf.adminpwd));
 	if (!RegkeyReadString(hKey, REGKEY_ADMINPWD, strbuf, sizeof(strbuf))) {
 		strcpy(d2gsconf.adminpwd, "d2gsdmin");
-	} else
-		strncpy(d2gsconf.adminpwd, strbuf, sizeof(d2gsconf.adminpwd)-1);
+	}
+	else
+		strncpy(d2gsconf.adminpwd, strbuf, sizeof(d2gsconf.adminpwd) - 1);
 
 	/* D2CSSECRECT */
 	ZeroMemory(d2gsconf.d2cssecrect, sizeof(d2gsconf.d2cssecrect));
 	if (!RegkeyReadString(hKey, REGKEY_D2CSSECRECT, strbuf, sizeof(strbuf))) {
 		strcpy(d2gsconf.d2cssecrect, "");
-	} else
-		strncpy(d2gsconf.d2cssecrect, strbuf, sizeof(d2gsconf.d2cssecrect)-1);
+	}
+	else
+		strncpy(d2gsconf.d2cssecrect, strbuf, sizeof(d2gsconf.d2cssecrect) - 1);
 
 	/* ADMINPORT */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ADMINPORT, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ADMINPORT, DEFAULT_ADMIN_PORT);
+			REGKEY_ADMINPORT, DEFAULT_ADMIN_PORT);
 		d2gsconf.adminport = DEFAULT_D2DBS_PORT;
-	} else
+	}
+	else
 		d2gsconf.adminport = htons((short)dwval);
 
 	/* ADMINTIMEOUT */
 	if (!RegkeyReadDWORD(hKey, REGKEY_ADMINTIMEOUT, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_ADMINTIMEOUT, DEFAULT_ADMIN_TIMEOUT);
+			REGKEY_ADMINTIMEOUT, DEFAULT_ADMIN_TIMEOUT);
 		d2gsconf.admintimeout = DEFAULT_ADMIN_TIMEOUT;
-	} else
+	}
+	else
 		d2gsconf.admintimeout = dwval;
 
 	/* MAXGAMELIFE */
 	if (!RegkeyReadDWORD(hKey, REGKEY_MAXGAMELIFE, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_MAXGAMELIFE, DEFAULT_MAXGAMELIFE);
+			REGKEY_MAXGAMELIFE, DEFAULT_MAXGAMELIFE);
 		d2gsconf.maxgamelife = DEFAULT_MAXGAMELIFE;
-	} else
+	}
+	else
 		d2gsconf.maxgamelife = dwval;
 
 	/* GSSHUTDOWNINTERVAL */
 	if (!RegkeyReadDWORD(hKey, REGKEY_GSSHUTDOWNINTERVAL, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_GSSHUTDOWNINTERVAL, DEFAULT_GS_SHUTDOWN_INTERVAL);
+			REGKEY_GSSHUTDOWNINTERVAL, DEFAULT_GS_SHUTDOWN_INTERVAL);
 		d2gsconf.gsshutdowninterval = DEFAULT_GS_SHUTDOWN_INTERVAL;
-	} else
+	}
+	else
 		d2gsconf.gsshutdowninterval = dwval;
 
 	/* MULTICPUMASK */
 	if (!RegkeyReadDWORD(hKey, REGKEY_MULTICPUMASK, &dwval)) {
 		D2GSEventLog("D2GSReadConfig", "Can't read key '%s', set to default %d",
-				REGKEY_MULTICPUMASK, DEFAULT_MULTICPUMASK);
+			REGKEY_MULTICPUMASK, DEFAULT_MULTICPUMASK);
 		d2gsconf.multicpumask = DEFAULT_MULTICPUMASK;
-	} else
+	}
+	else
 		d2gsconf.multicpumask = dwval;
 
 	/* MOTD */
 	ZeroMemory(d2gsconf.motd, sizeof(d2gsconf.motd));
 	if (RegkeyReadString(hKey, REGKEY_MOTD, strbuf, sizeof(strbuf)))
-		strncpy(d2gsconf.motd, strbuf, sizeof(d2gsconf.motd)-1);
+		strncpy(d2gsconf.motd, strbuf, sizeof(d2gsconf.motd) - 1);
 
 	result = TRUE;
 
@@ -238,7 +259,7 @@ tocloseregkey:
  *********************************************************************/
 int RegkeyOpen(HKEY hKeyRoot, LPCTSTR lpSubKey, PHKEY hKey, REGSAM sam)
 {
-	if (RegOpenKeyEx(hKeyRoot, lpSubKey, 0, sam, hKey)==ERROR_SUCCESS)
+	if (RegOpenKeyEx(hKeyRoot, lpSubKey, 0, sam, hKey) == ERROR_SUCCESS)
 		return TRUE;
 	else
 		return FALSE;
@@ -273,10 +294,11 @@ int RegkeyReadString(HKEY hKey, LPCTSTR name, char *buf, DWORD buflen)
 	dwLen = buflen;
 	ZeroMemory(buf, buflen);
 	lReturn = RegQueryValueEx(hKey, name, NULL, &dwType, buf, &dwLen);
-	if (lReturn==ERROR_SUCCESS) {
-		*(buf+buflen-1) = 0;
+	if (lReturn == ERROR_SUCCESS) {
+		*(buf + buflen - 1) = 0;
 		return TRUE;
-	} else
+	}
+	else
 		return FALSE;
 
 } /* End of RegkeyReadString() */
@@ -295,10 +317,11 @@ int RegkeyReadDWORD(HKEY hKey, LPCTSTR name, DWORD *val)
 		return FALSE;
 	dwLen = sizeof(dwVal);
 	lReturn = RegQueryValueEx(hKey, name, NULL, &dwType, (LPBYTE)&dwVal, &dwLen);
-	if (lReturn==ERROR_SUCCESS) {
+	if (lReturn == ERROR_SUCCESS) {
 		*val = dwVal;
 		return TRUE;
-	} else
+	}
+	else
 		return FALSE;
 
 } /* End of RegkeyReadDWORD() */
@@ -314,9 +337,9 @@ int RegkeyWriteString(HKEY hKey, LPCTSTR name, LPCSTR buf)
 	LONG	lReturn;
 
 	if ((!hKey) || (!name))	return FALSE;
-	dwLen = strlen(buf)+1;
+	dwLen = strlen(buf) + 1;
 	lReturn = RegSetValueEx(hKey, name, 0L, REG_SZ, (const BYTE*)buf, dwLen);
-	if (lReturn==ERROR_SUCCESS)
+	if (lReturn == ERROR_SUCCESS)
 		return TRUE;
 	else
 		return FALSE;
@@ -337,7 +360,7 @@ int RegkeyWriteDWORD(HKEY hKey, LPCTSTR name, DWORD val)
 	dwVal = val;
 	dwLen = sizeof(dwVal);
 	lReturn = RegSetValueEx(hKey, name, 0L, REG_DWORD, (const BYTE*)&dwVal, dwLen);
-	if (lReturn==ERROR_SUCCESS)
+	if (lReturn == ERROR_SUCCESS)
 		return TRUE;
 	else
 		return FALSE;
@@ -358,7 +381,8 @@ int D2GSSetConfigDWORD(LPCSTR keyname, DWORD dwVal)
 	if (!RegkeyWriteDWORD(hKey, keyname, dwVal)) {
 		RegkeyClose(hKey);
 		return FALSE;
-	} else {
+	}
+	else {
 		RegkeyClose(hKey);
 		return TRUE;
 	}
@@ -379,7 +403,8 @@ int D2GSSetConfigString(LPCSTR keyname, LPCSTR str)
 	if (!RegkeyWriteString(hKey, keyname, str)) {
 		RegkeyClose(hKey);
 		return FALSE;
-	} else {
+	}
+	else {
 		RegkeyClose(hKey);
 		return TRUE;
 	}

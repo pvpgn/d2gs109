@@ -7,7 +7,7 @@
  * from bnet/common/introtate.h
  * Copyright (C) 2000  Ross Combs (rocombs@cs.nmsu.edu)
  */
-/* ROTL(x,n,w) rotates "w" bit wide value "x" by "n" bits to the left */
+ /* ROTL(x,n,w) rotates "w" bit wide value "x" by "n" bits to the left */
 #ifndef ROTL
 #define ROTL(x,n,w) (((n)%(w)) ? (((x)<<((n)%(w))) | ((x)>>((w)-((n)%(w))))) : (x))
 #endif

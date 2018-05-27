@@ -7,9 +7,9 @@
 #define	DEFAULT_PIECE_NUMBER		100
 #define	DEFAULT_CHECK_SIZE 			5000000
 
-static char const * CheckFileList[]={
+static char const * CheckFileList[] = {
 	"Patch_d2.mpq", "D2Data.mpq", "D2Exp.mpq", "d2server.dll", "D2Win.dll",
-	"D2Game.dll", "D2Client.dll", "D2Common.dll", "D2Net.dll", "Fog.dll", 
+	"D2Game.dll", "D2Client.dll", "D2Common.dll", "D2Net.dll", "Fog.dll",
 	"Storm.dll", "D2Lang.dll", "D2Cmp.dll" , NULL
 };
 
@@ -21,15 +21,15 @@ extern DWORD VersionCheck(void)
 	CHAR	temp[MAX_PATH];
 	DWORD	i;
 
-	dwChecksum=0;
-	if (!GetModuleFileName(NULL,temp,sizeof(temp))) {
+	dwChecksum = 0;
+	if (!GetModuleFileName(NULL, temp, sizeof(temp))) {
 		return FALSE;
 	}
-	dwKey=DEFAULT_VERSIONCHECK_KEY;
+	dwKey = DEFAULT_VERSIONCHECK_KEY;
 	if (!CheckFile(dwKey, &dwChecksum, temp)) {
 		return FALSE;
 	}
-	for (i=0; CheckFileList[i]; i++) {
+	for (i = 0; CheckFileList[i]; i++) {
 		if (!CheckFile(dwKey, &dwChecksum, CheckFileList[i])) {
 			return FALSE;
 		}
@@ -41,22 +41,22 @@ extern DWORD VersionCheck(void)
 static DWORD CheckFile(DWORD dwKey, LPDWORD pdwChecksum, LPCSTR lpFileName)
 {
 	DWORD		dwSize, dwCount;
-	DWORD		i,j,temp,data;
+	DWORD		i, j, temp, data;
 	FILE * 		fp;
 
 	if (!pdwChecksum || !lpFileName) return FALSE;
-	if (!(fp=fopen(lpFileName,"rb"))) {
+	if (!(fp = fopen(lpFileName, "rb"))) {
 		return FALSE;
 	}
-	fseek(fp,0,SEEK_END);
-	dwSize=ftell(fp);
-	if (dwSize>DEFAULT_CHECK_SIZE) temp=DEFAULT_CHECK_SIZE;
-	else temp=dwSize;
-	dwCount=(temp/DEFAULT_PIECE_NUMBER)/sizeof(data);
-	for (j=0; j<DEFAULT_PIECE_NUMBER; j++) {
-		fseek(fp,(dwSize/DEFAULT_PIECE_NUMBER)*j,SEEK_SET);
-		for (i=0; i<dwCount; i++) {
-			fread(&data,1,sizeof(data),fp);
+	fseek(fp, 0, SEEK_END);
+	dwSize = ftell(fp);
+	if (dwSize > DEFAULT_CHECK_SIZE) temp = DEFAULT_CHECK_SIZE;
+	else temp = dwSize;
+	dwCount = (temp / DEFAULT_PIECE_NUMBER) / sizeof(data);
+	for (j = 0; j < DEFAULT_PIECE_NUMBER; j++) {
+		fseek(fp, (dwSize / DEFAULT_PIECE_NUMBER)*j, SEEK_SET);
+		for (i = 0; i < dwCount; i++) {
+			fread(&data, 1, sizeof(data), fp);
 			*pdwChecksum += data;
 			*pdwChecksum ^= dwKey;
 		}

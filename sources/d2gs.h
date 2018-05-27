@@ -12,7 +12,7 @@
 #include <windows.h>
 
 
-/* constants */
+ /* constants */
 #define D2CSERVER					0x01
 #define D2DBSERVER					0x02
 #define D2GSERVER					0x04
@@ -73,7 +73,7 @@
 
 
 /* structures */
-typedef int (*CLEANUP_ROUTINE)(void);
+typedef int(*CLEANUP_ROUTINE)(void);
 typedef struct RAW_CLEANUP_RT_ITEM {
 	char				comment[64];
 	CLEANUP_ROUTINE		cleanup;

@@ -1,6 +1,6 @@
 /*
  * main.c: main routine of this program
- * 
+ *
  * 2001-08-20 faster
  *   add initialization routine and main loop of this program
  */
@@ -23,7 +23,7 @@
 #include "handle_s2s.h"
 
 
-/* function declarations */
+ /* function declarations */
 int  DoCleanup(void);
 BOOL D2GSCheckRunning(void);
 int  CleanupRoutineForServerMutex(void);
@@ -32,8 +32,8 @@ BOOL WINAPI ControlHandler(DWORD dwCtrlType);
 
 
 /* some variables used just in this file */
-static HANDLE			hD2GSMutex  = NULL;
-static HANDLE			hStopEvent  = NULL;
+static HANDLE			hD2GSMutex = NULL;
+static HANDLE			hStopEvent = NULL;
 static CLEANUP_RT_ITEM	*pCleanupRT = NULL;
 
 
@@ -65,7 +65,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 	}
 
 	/* create a name event, for "d2gssvc" server controler to terminate me */
-	hStopEvent= CreateEvent(NULL, TRUE, FALSE, D2GS_STOP_EVENT_NAME);
+	hStopEvent = CreateEvent(NULL, TRUE, FALSE, D2GS_STOP_EVENT_NAME);
 	if (!hStopEvent) {
 		D2GSEventLog("main", "failed create stop event object");
 		DoCleanup();
@@ -116,9 +116,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, in
 
 	/* main server loop */
 	D2GSEventLog("main", "Entering Main Server Loop");
-	while(TRUE) {
+	while (TRUE) {
 		dwWait = WaitForSingleObject(hStopEvent, 1000);
-		if (dwWait!=WAIT_OBJECT_0) continue;
+		if (dwWait != WAIT_OBJECT_0) continue;
 		/* service controler tell me to stop now. "Yes, sir!" */
 		D2GSSetD2CSMaxGameNumber(0);
 		D2GSActive(FALSE);
@@ -142,7 +142,7 @@ int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment)
 {
 	CLEANUP_RT_ITEM		*pitem;
 
-	if (pRoutine==NULL) return FALSE;
+	if (pRoutine == NULL) return FALSE;
 	pitem = (CLEANUP_RT_ITEM *)malloc(sizeof(CLEANUP_RT_ITEM));
 	if (!pitem) {
 		D2GSEventLog("CleanupRoutineInsert", "Can't alloc memory");
@@ -152,9 +152,9 @@ int CleanupRoutineInsert(CLEANUP_ROUTINE pRoutine, char *comment)
 
 	/* fill the structure */
 	if (comment)
-		strncpy(pitem->comment, comment, sizeof(pitem->comment)-1);
+		strncpy(pitem->comment, comment, sizeof(pitem->comment) - 1);
 	else
-		strncpy(pitem->comment, "unknown", sizeof(pitem->comment)-1);
+		strncpy(pitem->comment, "unknown", sizeof(pitem->comment) - 1);
 	pitem->cleanup = pRoutine;
 	pitem->next = pCleanupRT;
 	pCleanupRT = pitem;
@@ -173,7 +173,7 @@ int DoCleanup(void)
 	CLEANUP_RT_ITEM		*pitem, *pprev;
 
 	pitem = pCleanupRT;
-	while(pitem)
+	while (pitem)
 	{
 		D2GSEventLog("DoCleanup", "Calling cleanup routine '%s'", pitem->comment);
 		pitem->cleanup();
@@ -211,16 +211,19 @@ BOOL D2GSCheckRunning(void)
 
 	hD2GSMutex = NULL;
 	hMutex = CreateMutex(NULL, TRUE, D2GSERVER_MUTEX_NAME);
-	if (hMutex==NULL) {
+	if (hMutex == NULL) {
 		return TRUE;
-	} else if (GetLastError()==ERROR_ALREADY_EXISTS) {
+	}
+	else if (GetLastError() == ERROR_ALREADY_EXISTS) {
 		CloseHandle(hMutex);
 		return TRUE;
-	} else {
+	}
+	else {
 		if (CleanupRoutineInsert(CleanupRoutineForServerMutex, "Server Mutex")) {
 			hD2GSMutex = hMutex;
 			return FALSE;
-		} else {
+		}
+		else {
 			/* insert cleanup routine failed, assume server is running */
 			CloseHandle(hMutex);
 			return TRUE;
@@ -248,17 +251,17 @@ int CleanupRoutineForServerMutex(void)
  *********************************************************************/
 BOOL WINAPI ControlHandler(DWORD dwCtrlType)
 {
-	switch( dwCtrlType )
+	switch (dwCtrlType)
 	{
-		case CTRL_BREAK_EVENT:  // use Ctrl+C or Ctrl+Break to simulate
-		case CTRL_C_EVENT:      // SERVICE_CONTROL_STOP in debug mode
-			D2GSEventLog("ControlHandler", "CTRL_BREAK or CTRL_C event caught");
-			DoCleanup();
-			ExitProcess(0);
-			return TRUE;
-			break;
-    }
-    return FALSE;
+	case CTRL_BREAK_EVENT:  // use Ctrl+C or Ctrl+Break to simulate
+	case CTRL_C_EVENT:      // SERVICE_CONTROL_STOP in debug mode
+		D2GSEventLog("ControlHandler", "CTRL_BREAK or CTRL_C event caught");
+		DoCleanup();
+		ExitProcess(0);
+		return TRUE;
+		break;
+	}
+	return FALSE;
 
 } /* End of ControlHandler */
 

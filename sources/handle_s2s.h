@@ -33,28 +33,28 @@ void D2CSClientJoinGameRequest(LPVOID *lpdata);
 
 /* by callback function */
 BOOL D2GSCBFindPlayerToken(LPCSTR lpCharName, DWORD dwToken, WORD wGameId,
-				LPSTR lpAccountName, LPPLAYERDATA lpPlayerData);
+	LPSTR lpAccountName, LPPLAYERDATA lpPlayerData);
 void D2GSCBEnterGame(WORD wGameId, LPCSTR lpCharName, WORD wCharClass,
-				DWORD dwCharLevel, DWORD dwReserved);
+	DWORD dwCharLevel, DWORD dwReserved);
 void D2GSCBLeaveGame(LPGAMEDATA lpGameData, WORD wGameId, WORD wCharClass,
-				DWORD dwCharLevel, DWORD dwExpLow, DWORD dwExpHigh,
-				WORD wCharStatus, LPCSTR lpCharName, LPCSTR lpCharPortrait,
-				BOOL bUnlock, DWORD dwZero1, DWORD dwZero2,
-				LPCSTR lpAccountName, PLAYERDATA PlayerData,
-				PLAYERMARK PlayerMark);
+	DWORD dwCharLevel, DWORD dwExpLow, DWORD dwExpHigh,
+	WORD wCharStatus, LPCSTR lpCharName, LPCSTR lpCharPortrait,
+	BOOL bUnlock, DWORD dwZero1, DWORD dwZero2,
+	LPCSTR lpAccountName, PLAYERDATA PlayerData,
+	PLAYERMARK PlayerMark);
 void D2GSCBCloseGame(WORD wGameId);
-void D2GSCBUpdateGameInformation(WORD wGameId, LPCSTR lpCharName, 
-				WORD wCharClass, DWORD dwCharLevel);
+void D2GSCBUpdateGameInformation(WORD wGameId, LPCSTR lpCharName,
+	WORD wCharClass, DWORD dwCharLevel);
 void D2GSCBGetDatabaseCharacter(LPGAMEDATA lpGameData, LPCSTR lpCharName,
-						DWORD dwClientId, LPCSTR lpAccountName);
+	DWORD dwClientId, LPCSTR lpAccountName);
 void D2GSCBSaveDatabaseCharacter(LPGAMEDATA lpGameData, LPCSTR lpCharName,
-					LPCSTR lpAccountName, LPVOID lpSaveData,
-					DWORD dwSize, PLAYERDATA PlayerData);
+	LPCSTR lpAccountName, LPVOID lpSaveData,
+	DWORD dwSize, PLAYERDATA PlayerData);
 void D2GSWriteCharInfoFile(LPCSTR lpAccountName, LPCSTR lpCharName,
-					WORD wCharClass, DWORD dwCharLevel, DWORD dwExpLow,
-					WORD wCharStatus, LPCSTR lpCharPortrait);
+	WORD wCharClass, DWORD dwCharLevel, DWORD dwExpLow,
+	WORD wCharStatus, LPCSTR lpCharPortrait);
 void D2GSUpdateCharacterLadder(LPCSTR lpCharName, WORD wCharClass, DWORD dwCharLevel,
-					DWORD dwCharExpLow, DWORD dwCharExpHigh,  WORD wCharStatus);
+	DWORD dwCharExpLow, DWORD dwCharExpHigh, WORD wCharStatus);
 void D2GSLoadComplete(WORD wGameId, LPCSTR lpCharName, BOOL bExpansion);
 
 /* by d2dbs */

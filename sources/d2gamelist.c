@@ -14,10 +14,10 @@
 
 
 /* vars */
-static D2GAMEINFO		*lpGameInfoHead   = NULL;
-static D2CHARINFO		*lpPendingChar    = NULL;
+static D2GAMEINFO		*lpGameInfoHead = NULL;
+static D2CHARINFO		*lpPendingChar = NULL;
 static D2GETDATAREQUEST	*lpGetDataReqHead = NULL;
-static DWORD			currentgamenum    = 0;
+static DWORD			currentgamenum = 0;
 
 static char desc_game_difficulty[][32] = {
 	"normal", "nightmare", "hell"
@@ -40,7 +40,7 @@ void D2GSResetGameList(void)
 	/* to release all the memory */
 	EnterCriticalSection(&csGameList);
 	ph = lpGameInfoHead;
-	while(ph)
+	while (ph)
 	{
 		pnext = ph->next;
 		D2GSDeleteAllCharInGame(ph);
@@ -48,7 +48,7 @@ void D2GSResetGameList(void)
 		ph = pnext;
 	}
 	pChar = lpPendingChar;
-	while(pChar)
+	while (pChar)
 	{
 		pCharNext = pChar->next;
 		free(pChar);
@@ -57,7 +57,7 @@ void D2GSResetGameList(void)
 	D2GSEndAllGames();
 	charlist_flush();
 	lpGameInfoHead = NULL;
-	lpPendingChar  = NULL;
+	lpPendingChar = NULL;
 	currentgamenum = 0;
 	LeaveCriticalSection(&csGameList);
 	D2GSEventLog("D2GSResetGameList", "End all game in the Game List and in the GE");
@@ -89,12 +89,12 @@ int D2GSGetCurrentGameStatistic(DWORD *gamenum, DWORD *usernum)
 	gamecount = charcount = 0;
 	EnterCriticalSection(&csGameList);
 	lpGame = lpGameInfoHead;
-	while(lpGame)
+	while (lpGame)
 	{
 		gamecount++;
 		charcount += lpGame->CharCount;
 		lpGame = lpGame->next;
-		if (gamecount>500) break;
+		if (gamecount > 500) break;
 	}
 	LeaveCriticalSection(&csGameList);
 
@@ -117,17 +117,17 @@ void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo)
 	if (!lpGameInfo) return;
 	ph = lpGameInfo->lpCharInfo;
 	count = 0;
-	while(ph)
+	while (ph)
 	{
 		pnext = ph->next;
 		if (ph->CharLockStatus) {
 			D2GSEventLog("D2GSDeleteAllCharInGame",
-					"Unlock char %s(*%s) with unfinished loading status",
-					ph->CharName, ph->AcctName);
+				"Unlock char %s(*%s) with unfinished loading status",
+				ph->CharName, ph->AcctName);
 			D2GSUnlockChar(ph->AcctName, ph->CharName);
 		}
 		D2GSEventLog("D2GSDeleteAllCharInGame",
-				"Delete zombie char %s(*%s)", ph->CharName, ph->AcctName);
+			"Delete zombie char %s(*%s)", ph->CharName, ph->AcctName);
 		charlist_delete(ph->CharName);
 		free(ph);
 		count++;
@@ -148,7 +148,7 @@ void D2GSDeleteAllCharInGame(D2GAMEINFO *lpGameInfo)
  * Return: 0(success), other(failed)
  *********************************************************************/
 int D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
-						UCHAR difficulty, UCHAR hardcore, WORD wGameId)
+	UCHAR difficulty, UCHAR hardcore, WORD wGameId)
 {
 	D2GAMEINFO		*lpGameInfo;
 	D2GAMEINFO		*lpTemp;
@@ -161,14 +161,14 @@ int D2GSGameListInsert(UCHAR *GameName, UCHAR expansion,
 
 	/* fill the fields */
 	ZeroMemory(lpGameInfo, sizeof(D2GAMEINFO));
-	strncpy(lpGameInfo->GameName, GameName, MAX_GAMENAME_LEN-1);
-	lpGameInfo->expansion  = expansion;
+	strncpy(lpGameInfo->GameName, GameName, MAX_GAMENAME_LEN - 1);
+	lpGameInfo->expansion = expansion;
 	lpGameInfo->difficulty = difficulty;
-	lpGameInfo->hardcore   = hardcore;
-	lpGameInfo->GameId     = wGameId;
-	lpGameInfo->CharCount  = 0;
+	lpGameInfo->hardcore = hardcore;
+	lpGameInfo->GameId = wGameId;
+	lpGameInfo->CharCount = 0;
 	lpGameInfo->CreateTime = time(NULL);
-	lpGameInfo->disable    = FALSE;
+	lpGameInfo->disable = FALSE;
 
 	EnterCriticalSection(&csGameList);
 
@@ -222,7 +222,7 @@ int D2GSGameListDelete(D2GAMEINFO *lpGameInfo)
  * Return: 0(success), other(failed)
  *********************************************************************/
 int D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctName,
-			UCHAR *CharName, DWORD CharLevel, WORD CharClass, WORD EnterGame)
+	UCHAR *CharName, DWORD CharLevel, WORD CharClass, WORD EnterGame)
 {
 	D2CHARINFO		*lpCharInfo;
 	D2CHARINFO		*lpTemp;
@@ -238,24 +238,24 @@ int D2GSInsertCharIntoGameInfo(D2GAMEINFO *lpGameInfo, DWORD token, UCHAR *AcctN
 
 	/* fill the fields */
 	ZeroMemory(lpCharInfo, sizeof(D2CHARINFO));
-	strncpy(lpCharInfo->AcctName, AcctName, MAX_ACCTNAME_LEN-1);
-	strncpy(lpCharInfo->CharName, CharName, MAX_CHARNAME_LEN-1);
-	lpCharInfo->token          = token;
-	lpCharInfo->CharLevel      = CharLevel;
-	lpCharInfo->CharClass      = CharClass;
-	lpCharInfo->EnterGame      = EnterGame;
-	lpCharInfo->AllowLadder    = FALSE;
+	strncpy(lpCharInfo->AcctName, AcctName, MAX_ACCTNAME_LEN - 1);
+	strncpy(lpCharInfo->CharName, CharName, MAX_CHARNAME_LEN - 1);
+	lpCharInfo->token = token;
+	lpCharInfo->CharLevel = CharLevel;
+	lpCharInfo->CharClass = CharClass;
+	lpCharInfo->EnterGame = EnterGame;
+	lpCharInfo->AllowLadder = FALSE;
 	lpCharInfo->CharLockStatus = FALSE;
-	lpCharInfo->EnterTime      = time(NULL);
+	lpCharInfo->EnterTime = time(NULL);
 	lpCharInfo->CharCreateTime = lpCharInfo->EnterTime;
-	lpCharInfo->GameId         = lpGameInfo->GameId;
-	lpCharInfo->lpGameInfo     = lpGameInfo;
-	lpCharInfo->ClientId       = 0;
+	lpCharInfo->GameId = lpGameInfo->GameId;
+	lpCharInfo->lpGameInfo = lpGameInfo;
+	lpCharInfo->ClientId = 0;
 
 	/* insert char into char list table */
-	if ((val=charlist_insert(CharName, lpCharInfo, lpGameInfo))!=0) {
+	if ((val = charlist_insert(CharName, lpCharInfo, lpGameInfo)) != 0) {
 		D2GSEventLog("D2GSInsertCharIntoGameInfo",
-				"failed insert info charlist for %s(*%s), code: %d", CharName, AcctName, val);
+			"failed insert info charlist for %s(*%s), code: %d", CharName, AcctName, val);
 		free(lpCharInfo);
 		return D2GSERROR_CHAR_ALREADY_IN_GAME;
 	}
@@ -311,7 +311,7 @@ int D2GSDeleteCharFromGameInfo(D2GAMEINFO *lpGameInfo, D2CHARINFO *lpCharInfo)
  * Return: 0(success), other(failed)
  *********************************************************************/
 int D2GSInsertCharIntoPendingList(DWORD token, UCHAR *AcctName,
-					UCHAR *CharName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame)
+	UCHAR *CharName, DWORD CharLevel, WORD CharClass, D2GAMEINFO *lpGame)
 {
 	D2CHARINFO		*lpCharInfo;
 	D2CHARINFO		*lpTemp;
@@ -324,16 +324,16 @@ int D2GSInsertCharIntoPendingList(DWORD token, UCHAR *AcctName,
 
 	/* fill the fields */
 	ZeroMemory(lpCharInfo, sizeof(D2CHARINFO));
-	strncpy(lpCharInfo->AcctName, AcctName, MAX_ACCTNAME_LEN-1);
-	strncpy(lpCharInfo->CharName, CharName, MAX_CHARNAME_LEN-1);
-	lpCharInfo->token      = token;
-	lpCharInfo->CharLevel  = CharLevel;
-	lpCharInfo->CharClass  = CharClass;
-	lpCharInfo->EnterGame  = FALSE;
-	lpCharInfo->EnterTime  = 0;
-	lpCharInfo->GameId     = lpGame->GameId;
+	strncpy(lpCharInfo->AcctName, AcctName, MAX_ACCTNAME_LEN - 1);
+	strncpy(lpCharInfo->CharName, CharName, MAX_CHARNAME_LEN - 1);
+	lpCharInfo->token = token;
+	lpCharInfo->CharLevel = CharLevel;
+	lpCharInfo->CharClass = CharClass;
+	lpCharInfo->EnterGame = FALSE;
+	lpCharInfo->EnterTime = 0;
+	lpCharInfo->GameId = lpGame->GameId;
 	lpCharInfo->lpGameInfo = lpGame;
-	lpCharInfo->ClientId   = 0;
+	lpCharInfo->ClientId = 0;
 
 	EnterCriticalSection(&csGameList);
 
@@ -370,9 +370,10 @@ int D2GSDeletePendingChar(D2CHARINFO *lpCharInfo)
 	else lpPendingChar = lpNext;
 	if (lpNext) lpNext->prev = lpPrev;
 	if ((!IsBadReadPtr(lpCharInfo->lpGameInfo, sizeof(D2GAMEINFO)))
-					&& (lpCharInfo->lpGameInfo->GameId == lpCharInfo->GameId)) {
+		&& (lpCharInfo->lpGameInfo->GameId == lpCharInfo->GameId)) {
 		(lpCharInfo->lpGameInfo->CharCount)--;
-	} else {
+	}
+	else {
 		D2GSEventLog("D2GSDeletePendingChar",
 			"Delete a pending char %s(*%s) in an already closed game",
 			lpCharInfo->CharName, lpCharInfo->AcctName);
@@ -402,10 +403,10 @@ int D2GSInsertGetDataRequest(UCHAR *AcctName, UCHAR *CharName, DWORD dwClientId,
 
 	/* fill the fields */
 	ZeroMemory(lpGetDataReq, sizeof(D2GETDATAREQUEST));
-	strncpy(lpGetDataReq->AcctName, AcctName, MAX_ACCTNAME_LEN-1);
-	strncpy(lpGetDataReq->CharName, CharName, MAX_CHARNAME_LEN-1);
-	lpGetDataReq->ClientId  = dwClientId;
-	lpGetDataReq->Seqno     = dwSeqno;
+	strncpy(lpGetDataReq->AcctName, AcctName, MAX_ACCTNAME_LEN - 1);
+	strncpy(lpGetDataReq->CharName, CharName, MAX_CHARNAME_LEN - 1);
+	lpGetDataReq->ClientId = dwClientId;
+	lpGetDataReq->Seqno = dwSeqno;
 	lpGetDataReq->TickCount = 0;
 
 	EnterCriticalSection(&csGameList);
@@ -459,7 +460,7 @@ D2GAMEINFO *D2GSFindGameInfoByGameId(WORD GameId)
 
 	EnterCriticalSection(&csGameList);
 	lpGame = lpGameInfoHead;
-	while(lpGame)
+	while (lpGame)
 	{
 		if (lpGame->GameId == GameId) break;
 		lpGame = lpGame->next;
@@ -482,7 +483,7 @@ D2GAMEINFO *D2GSFindGameInfoByGameName(UCHAR *GameName)
 
 	EnterCriticalSection(&csGameList);
 	lpGame = lpGameInfoHead;
-	while(lpGame)
+	while (lpGame)
 	{
 		if (!strcmp(lpGame->GameName, GameName)) break;
 		lpGame = lpGame->next;
@@ -505,7 +506,7 @@ D2CHARINFO *D2GSFindCharInGameByCharName(D2GAMEINFO *lpGame, UCHAR *CharName)
 
 	EnterCriticalSection(&csGameList);
 	lpChar = lpGame->lpCharInfo;
-	while(lpChar)
+	while (lpChar)
 	{
 		if (!strcmp(lpChar->CharName, CharName)) break;
 		lpChar = lpChar->next;
@@ -526,7 +527,7 @@ D2CHARINFO *D2GSFindPendingCharByToken(DWORD token)
 
 	EnterCriticalSection(&csGameList);
 	lpChar = lpPendingChar;
-	while(lpChar)
+	while (lpChar)
 	{
 		if (lpChar->token == token) break;
 		lpChar = lpChar->next;
@@ -549,7 +550,7 @@ D2CHARINFO *D2GSFindPendingCharByCharName(UCHAR *CharName)
 
 	EnterCriticalSection(&csGameList);
 	lpChar = lpPendingChar;
-	while(lpChar)
+	while (lpChar)
 	{
 		if (!strcmp(lpChar->CharName, CharName)) break;
 		lpChar = lpChar->next;
@@ -570,9 +571,9 @@ D2GETDATAREQUEST *D2GSFindGetDataRequestBySeqno(DWORD dwSeqno)
 
 	EnterCriticalSection(&csGameList);
 	lpGetDataReq = lpGetDataReqHead;
-	while(lpGetDataReq)
+	while (lpGetDataReq)
 	{
-		if (lpGetDataReq->Seqno==dwSeqno) break;
+		if (lpGetDataReq->Seqno == dwSeqno) break;
 		lpGetDataReq = lpGetDataReq->next;
 	}
 	LeaveCriticalSection(&csGameList);
@@ -591,7 +592,7 @@ void D2GSPendingCharTimerRoutine(void)
 
 	EnterCriticalSection(&csGameList);
 	lpChar = lpPendingChar;
-	while(lpChar)
+	while (lpChar)
 	{
 		lpChar->TickCount++;
 		if ((lpChar->TickCount) > (d2gsconf.charpendingtimeout))
@@ -624,7 +625,7 @@ void D2GSGetDataRequestTimerRoutine(void)
 
 	EnterCriticalSection(&csGameList);
 	lpGetDataReq = lpGetDataReqHead;
-	while(lpGetDataReq)
+	while (lpGetDataReq)
 	{
 		lpGetDataReq->TickCount++;
 		if ((lpGetDataReq->TickCount) > GET_DATA_TIMEOUT)
@@ -639,25 +640,26 @@ void D2GSGetDataRequestTimerRoutine(void)
 				"Failed get CHARSAVE data for '%s'(*%s)",
 				lpTimeOutReq->CharName, lpTimeOutReq->AcctName);
 			/* check if this char is still in the list? if so, delete it */
-			strncpy(AcctName, lpTimeOutReq->AcctName, MAX_ACCTNAME_LEN-1);
-			AcctName[MAX_ACCTNAME_LEN-1] = '\0';
-			strncpy(CharName, lpTimeOutReq->CharName, MAX_CHARNAME_LEN-1);
-			CharName[MAX_CHARNAME_LEN-1] = '\0';
+			strncpy(AcctName, lpTimeOutReq->AcctName, MAX_ACCTNAME_LEN - 1);
+			AcctName[MAX_ACCTNAME_LEN - 1] = '\0';
+			strncpy(CharName, lpTimeOutReq->CharName, MAX_CHARNAME_LEN - 1);
+			CharName[MAX_CHARNAME_LEN - 1] = '\0';
 			lpGameInfo = (D2GAMEINFO*)charlist_getdata(CharName, CHARLIST_GET_GAMEINFO);
 			lpCharInfo = (D2CHARINFO*)charlist_getdata(CharName, CHARLIST_GET_CHARINFO);
 			if (lpCharInfo && lpGameInfo &&
-						!IsBadReadPtr(lpCharInfo, sizeof(D2CHARINFO)) &&
-						!IsBadReadPtr(lpGameInfo, sizeof(D2GAMEINFO)) &&
-						(lpCharInfo->lpGameInfo == lpGameInfo) &&
-						(lpCharInfo->GameId == lpGameInfo->GameId) &&
-						(lpCharInfo->ClientId == dwClientId)) {
+				!IsBadReadPtr(lpCharInfo, sizeof(D2CHARINFO)) &&
+				!IsBadReadPtr(lpGameInfo, sizeof(D2GAMEINFO)) &&
+				(lpCharInfo->lpGameInfo == lpGameInfo) &&
+				(lpCharInfo->GameId == lpGameInfo->GameId) &&
+				(lpCharInfo->ClientId == dwClientId)) {
 				D2GSDeleteCharFromGameInfo(lpGameInfo, lpCharInfo);
 				D2GSEventLog("D2GSGetDataRequestTimerRoutine",
 					"delete char %s(*%s) still in game '%s'(%u)",
 					CharName, AcctName, lpGameInfo->GameName, lpGameInfo->GameId);
-			} else {
+			}
+			else {
 				D2GSEventLog("D2GSGetDataRequestTimerRoutine",
-					"char %s(*%s) NOT in game now",	CharName, AcctName);
+					"char %s(*%s) NOT in game now", CharName, AcctName);
 			}
 			/* delete the overdue quest */
 			D2GSDeleteGetDataRequest(lpTimeOutReq);
@@ -680,7 +682,7 @@ void FormatTimeString(long t, u_char *buf, int len)
 	ZeroMemory(buf, len);
 	now = t;
 	tm = localtime(&now);
-	_snprintf(buf, len-1, "%02d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
+	_snprintf(buf, len - 1, "%02d:%02d:%02d", tm->tm_hour, tm->tm_min, tm->tm_sec);
 	return;
 
 } /* End of FormatTimeString() */
@@ -702,20 +704,20 @@ void D2GSShowGameList(unsigned int ns)
 
 	EnterCriticalSection(&csGameList);
 	lpGame = lpGameInfoHead;
-	while(lpGame)
+	while (lpGame)
 	{
 		FormatTimeString(lpGame->CreateTime, timestr, sizeof(timestr));
 		sprintf(buf, "| %03d  %-15s  %-6u  %-7s  %-4s  %-10s  %-5u %-10s %-3s |\r\n",
-			gamecount+1, lpGame->GameName, lpGame->GameId, 
+			gamecount + 1, lpGame->GameName, lpGame->GameId,
 			lpGame->expansion ? "exp" : "classic",
-			lpGame->hardcore  ? "hc" : "sc",
-			desc_game_difficulty[lpGame->difficulty%3], lpGame->CharCount, timestr,
+			lpGame->hardcore ? "hc" : "sc",
+			desc_game_difficulty[lpGame->difficulty % 3], lpGame->CharCount, timestr,
 			lpGame->disable ? "Y" : "N");
 		SENDSTR(ns, buf);
 		gamecount++;
 		charcount += lpGame->CharCount;
 		lpGame = lpGame->next;
-		if (gamecount>500) break;
+		if (gamecount > 500) break;
 	}
 	LeaveCriticalSection(&csGameList);
 
@@ -752,10 +754,10 @@ void D2GSShowCharInGame(unsigned int ns, WORD GameId)
 	SENDSTR(ns, buf);
 	FormatTimeString(lpGame->CreateTime, timestr, sizeof(timestr));
 	sprintf(buf, "| %-15s  %-6u  %-7s  %-4s  %-10s  %-5u %-10s %-3s |\r\n",
-		lpGame->GameName, lpGame->GameId, 
+		lpGame->GameName, lpGame->GameId,
 		lpGame->expansion ? "exp" : "classic",
-		lpGame->hardcore  ? "hc" : "sc",
-		desc_game_difficulty[lpGame->difficulty%3], lpGame->CharCount, timestr,
+		lpGame->hardcore ? "hc" : "sc",
+		desc_game_difficulty[lpGame->difficulty % 3], lpGame->CharCount, timestr,
 		lpGame->disable ? "Y" : "N");
 	SENDSTR(ns, buf);
 	sprintf(buf, "+--------------------------------------------------------------------------+\r\n\r\n");
@@ -765,16 +767,16 @@ void D2GSShowCharInGame(unsigned int ns, WORD GameId)
 	SENDSTR(ns, buf);
 	count = 0;
 	lpChar = lpGame->lpCharInfo;
-	while(lpChar)
+	while (lpChar)
 	{
 		FormatTimeString(lpChar->EnterTime, timestr, sizeof(timestr));
 		sprintf(buf, "| %03d  %-15s  %-15s  %-5s  %-5u  %-9s |\r\n",
-			count+1, lpChar->AcctName, lpChar->CharName,
-			desc_char_class[lpChar->CharClass%7], lpChar->CharLevel, timestr);
+			count + 1, lpChar->AcctName, lpChar->CharName,
+			desc_char_class[lpChar->CharClass % 7], lpChar->CharLevel, timestr);
 		SENDSTR(ns, buf);
 		count++;
 		lpChar = lpChar->next;
-		if (count>8) break;
+		if (count > 8) break;
 	}
 	LeaveCriticalSection(&csGameList);
 	sprintf(buf, "+----------------------------------------------------------------+\r\n");
@@ -843,12 +845,12 @@ int chat_message_announce_all(DWORD dwMsgType, const char *msg)
 	EnterCriticalSection(&csGameList);
 	gamecount = 0;
 	lpGame = lpGameInfoHead;
-	while(lpGame)
+	while (lpGame)
 	{
 		gamecount++;
 		chat_message_announce_game2(dwMsgType, lpGame, msg);
 		lpGame = lpGame->next;
-		if (gamecount>500) break;
+		if (gamecount > 500) break;
 	}
 	LeaveCriticalSection(&csGameList);
 	return 0;
@@ -862,10 +864,10 @@ int chat_message_announce_all(DWORD dwMsgType, const char *msg)
 int chat_message_announce_game(DWORD dwMsgType, WORD GameId, const char *msg)
 {
 	D2GAMEINFO	*lpGame;
-	
+
 	EnterCriticalSection(&csGameList);
 	lpGame = D2GSFindGameInfoByGameId(GameId);
-	if (lpGame==NULL) {
+	if (lpGame == NULL) {
 		LeaveCriticalSection(&csGameList);
 		return -1;
 	}
@@ -887,13 +889,13 @@ int chat_message_announce_game2(DWORD dwMsgType, D2GAMEINFO *lpGame, const char 
 	EnterCriticalSection(&csGameList);
 	charcount = 0;
 	lpChar = lpGame->lpCharInfo;
-	while(lpChar)
+	while (lpChar)
 	{
 		charcount++;
 		D2GSSendClientChatMessage(lpChar->ClientId, dwMsgType,
-				D2COLOR_ID_RED, "[administrator]", msg);
+			D2COLOR_ID_RED, "[administrator]", msg);
 		lpChar = lpChar->next;
-		if (charcount>8) break;
+		if (charcount > 8) break;
 	}
 	LeaveCriticalSection(&csGameList);
 	return 0;
@@ -915,7 +917,7 @@ int chat_message_announce_char(DWORD dwMsgType, const char *CharName, const char
 		return -1;
 	}
 	D2GSSendClientChatMessage(lpChar->ClientId, dwMsgType,
-			D2COLOR_ID_RED, "[administrator]", msg);
+		D2COLOR_ID_RED, "[administrator]", msg);
 	LeaveCriticalSection(&csGameList);
 	return 0;
 } /* End of chat_message_announce_char() */
@@ -941,7 +943,7 @@ int D2GSMOTDAdd(DWORD dwClientId)
 	MOTDCLIENT	*pmotd;
 
 	pmotd = (MOTDCLIENT*)malloc(sizeof(MOTDCLIENT));
-	if (pmotd==NULL) return -1;
+	if (pmotd == NULL) return -1;
 	pmotd->ClientId = dwClientId;
 	EnterCriticalSection(&csGameList);
 	list_add_tail((struct list_head*)pmotd, &list_motd);
@@ -964,7 +966,7 @@ int D2GSSendMOTD(void)
 
 	/* we do this one time per second */
 	count++;
-	if (count<(SEND_MOTD_INTERVAL/TIMER_TICK_IN_MS)) return 0;
+	if (count < (SEND_MOTD_INTERVAL / TIMER_TICK_IN_MS)) return 0;
 	count = 0;
 
 	strcpy(motd_str, d2gsconf.motd);

@@ -1,6 +1,6 @@
 #ifndef INCLUDED_D2CS_D2GS_PROTOCOL_H
 #define INCLUDED_D2CS_D2GS_PROTOCOL_H
-/* 
+/*
  * there is only little comments in this header file
  * check the documents for more details
 */

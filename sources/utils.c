@@ -5,9 +5,9 @@
 #define	SPLIT_STRING_INCREASEMENT	32
 extern char * * strtoarray(char const * str, char const * delim, int * count)
 {
-	int	i ,n, index_size;
+	int	i, n, index_size;
 	int	in_delim, match;
-	char	* temp, * result;
+	char	* temp, *result;
 	int	* pindex;
 	char	* pd;
 	char	const * ps;
@@ -15,79 +15,79 @@ extern char * * strtoarray(char const * str, char const * delim, int * count)
 
 	if (!str || !delim || !count) return NULL;
 
-	temp=malloc(strlen(str)+1);
+	temp = malloc(strlen(str) + 1);
 	if (!temp) return NULL;
 
 	n = SPLIT_STRING_INIT_COUNT;
-	pindex=malloc(sizeof(char *) * n);
+	pindex = malloc(sizeof(char *) * n);
 	if (!pindex) {
 		free(temp);
 		return NULL;
 	}
 
-	*count=0;
-	in_delim=1;
-	ps=str;
-	pd=temp;
-	pindex[0]=0;
-	while (*ps!='\0') {
-		match=0;
-		for (i=0; delim[i]!='\0'; i++) {
-			if ( *ps == delim[i]) {
-				match=1;
+	*count = 0;
+	in_delim = 1;
+	ps = str;
+	pd = temp;
+	pindex[0] = 0;
+	while (*ps != '\0') {
+		match = 0;
+		for (i = 0; delim[i] != '\0'; i++) {
+			if (*ps == delim[i]) {
+				match = 1;
 				if (!in_delim) {
 					*pd = '\0';
 					pd++;
 					(*count)++;
-					in_delim=1;
+					in_delim = 1;
 				}
 				break;
 			}
 		}
 		if (!match) {
 			if (in_delim) {
-				if (*count>=n) {
+				if (*count >= n) {
 					n += SPLIT_STRING_INCREASEMENT;
-					if (!(realloc_tmp=realloc(pindex,n * sizeof(char *)))) {
+					if (!(realloc_tmp = realloc(pindex, n * sizeof(char *)))) {
 						free(pindex);
 						free(temp);
 						return NULL;
 					}
-					pindex=(int *)realloc_tmp;
+					pindex = (int *)realloc_tmp;
 				}
-				pindex[*count]= pd-temp;
+				pindex[*count] = pd - temp;
 				in_delim = 0;
 			}
-			*pd = * ps;
+			*pd = *ps;
 			pd++;
 		}
 		ps++;
 	}
 	if (!in_delim) {
-		*pd='\0';
+		*pd = '\0';
 		pd++;
 		(*count)++;
 	}
-	index_size=*count * sizeof(char *);
+	index_size = *count * sizeof(char *);
 	if (!index_size) {
 		free(temp);
 		free(pindex);
 		return NULL;
 	}
-	result=malloc(pd-temp+index_size);
+	result = malloc(pd - temp + index_size);
 	if (!result) {
 		free(temp);
 		free(pindex);
 		return NULL;
 	}
-	memcpy(result+index_size,temp,pd-temp);
-	for (i=0; i< *count; i++) {
-		pindex[i]+=(int)result+index_size;
+	memcpy(result + index_size, temp, pd - temp);
+	for (i = 0; i < *count; i++) {
+		pindex[i] += (int)result + index_size;
 	}
-	memcpy(result,pindex,index_size);
+	memcpy(result, pindex, index_size);
 	free(temp);
 	free(pindex);
-	return (char **) result;
+	return (char **)result;
 }
 
 
@@ -101,64 +101,66 @@ extern char * * strtoargv(char const * str, int * count)
 	char		* realloc_tmp;
 
 	if (!str || !count) return NULL;
-	temp=malloc(strlen(str)+1);
+	temp = malloc(strlen(str) + 1);
 	if (!temp) return NULL;
 	n = SPLIT_STRING_INIT_COUNT;
-	pindex=malloc(n * sizeof (char *));
+	pindex = malloc(n * sizeof(char *));
 	if (!pindex) return NULL;
 
-	i=j=0;
-	*count=0;
+	i = j = 0;
+	*count = 0;
 	while (str[i]) {
-		while (str[i]==' ' || str[i]=='\t') i++;
+		while (str[i] == ' ' || str[i] == '\t') i++;
 		if (!str[i]) break;
-		if ((unsigned int)(*count) >=n ) {
+		if ((unsigned int)(*count) >= n) {
 			n += SPLIT_STRING_INCREASEMENT;
-			if (!(realloc_tmp=realloc(pindex,n * sizeof(char *)))) {
+			if (!(realloc_tmp = realloc(pindex, n * sizeof(char *)))) {
 				free(pindex);
 				free(temp);
 				return NULL;
 			}
-			pindex=(int *)realloc_tmp;
+			pindex = (int *)realloc_tmp;
 		}
-		pindex[*count]=j;
+		pindex[*count] = j;
 		(*count)++;
-		if (str[i]=='"') {
+		if (str[i] == '"') {
 			i++;
 			while (str[i]) {
-				if (str[i]=='\\') {
+				if (str[i] == '\\') {
 					i++;
 					if (!str[i]) break;
-				} else if (str[i]=='"') {
+				}
+				else if (str[i] == '"') {
 					i++;
 					break;
 				}
-				temp[j++]=str[i++];
-			}
-		} else {
-			while (str[i] && str[i] != ' ' && str[i] != '\t') {
-				temp[j++]=str[i++];
+				temp[j++] = str[i++];
 			}
 		}
-		temp[j++]='\0';
+		else {
+			while (str[i] && str[i] != ' ' && str[i] != '\t') {
+				temp[j++] = str[i++];
+			}
+		}
+		temp[j++] = '\0';
 	}
-	index_size= *count * sizeof(char *);
+	index_size = *count * sizeof(char *);
 	if (!index_size) {
 		free(temp);
 		free(pindex);
 		return NULL;
 	}
-	result=malloc(j+index_size);
+	result = malloc(j + index_size);
 	if (!result) {
 		free(temp);
 		free(pindex);
 		return NULL;
 	}
-	memcpy(result+index_size,temp,j);
-	for (i=0; i< *count; i++) {
-		pindex[i] +=(int)result+index_size;
+	memcpy(result + index_size, temp, j);
+	for (i = 0; i < *count; i++) {
+		pindex[i] += (int)result + index_size;
 	}
-	memcpy(result,pindex,index_size);
+	memcpy(result, pindex, index_size);
 	free(temp);
 	free(pindex);
 	return (char * *)result;
@@ -172,31 +174,32 @@ extern char * str_strip_affix(char * str, char const * affix)
 
 	if (!str) return NULL;
 	if (!affix) return str;
-	for (i=0; str[i]; i++) {
-		match=0;
-		for (n=0; affix[n]; n++) {
-			if (str[i]==affix[n]) {
-				match=1;
+	for (i = 0; str[i]; i++) {
+		match = 0;
+		for (n = 0; affix[n]; n++) {
+			if (str[i] == affix[n]) {
+				match = 1;
 				break;
 			}
 		}
 		if (!match) break;
 	}
-	for (j=strlen(str)-1; j>=i; j--) {
-		match=0;
-		for (n=0; affix[n]; n++) {
-			if (str[j]==affix[n]) {
-				match=1;
+	for (j = strlen(str) - 1; j >= i; j--) {
+		match = 0;
+		for (n = 0; affix[n]; n++) {
+			if (str[j] == affix[n]) {
+				match = 1;
 				break;
 			}
 		}
 		if (!match) break;
 	}
-	if (i>j) {
-		str[0]='\0';
-	} else {
-		memmove(str,str+i,j-i+1);
-		str[j-i+1]='\0';
+	if (i > j) {
+		str[0] = '\0';
+	}
+	else {
+		memmove(str, str + i, j - i + 1);
+		str[j - i + 1] = '\0';
 	}
 	return str;
 }
@@ -232,16 +235,16 @@ extern char *string_color(char *str)
 
 	if (!str) return NULL;
 	src = dest = str;
-	while(*src!='\0')
+	while (*src != '\0')
 	{
-		if (*src!='%') {
+		if (*src != '%') {
 			*dest++ = *src++;
 			continue;
 		}
 		tr = ColorHackTable;
-		while(tr->src!=NULL)
+		while (tr->src != NULL)
 		{
-			if (strnicmp(src, tr->src, strlen(tr->src))==0) {
+			if (strnicmp(src, tr->src, strlen(tr->src)) == 0) {
 				memcpy(dest, tr->dest, strlen(tr->dest));
 				src += strlen(tr->src);
 				dest += strlen(tr->dest);

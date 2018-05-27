@@ -85,7 +85,8 @@ int D2GSAdminInitialize(void)
 	/* add to the cleanup routine list */
 	if (CleanupRoutineInsert(CleanupRoutineForAdmin, "Administrator Console")) {
 		return TRUE;
-	} else {
+	}
+	else {
 		/* do some cleanup before quiting */
 		CleanupRoutineForAdmin();
 		return FALSE;
@@ -136,7 +137,7 @@ DWORD WINAPI admin_service(LPVOID lpParam)
 	DWORD				dwThreadId;
 
 	/* create our new socket for administraion */
-	if ((mainsock=socket(AF_INET,SOCK_STREAM,0))<0)	{
+	if ((mainsock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		D2GSEventLog("admin_service",
 			"failed create admin socket. code: %d", WSAGetLastError());
 		return -1;
@@ -148,14 +149,14 @@ DWORD WINAPI admin_service(LPVOID lpParam)
 	server.sin_family = AF_INET;
 	server.sin_addr.s_addr = htonl(INADDR_ANY);
 	server.sin_port = d2gsconf.adminport;
-	if (bind(mainsock, (struct sockaddr *)&server, sizeof(server))<0) {
+	if (bind(mainsock, (struct sockaddr *)&server, sizeof(server)) < 0) {
 		closesocket(mainsock);
 		mainsock = -1;
 		D2GSEventLog("admin_service",
 			"failed bind admin socket, port %u. code: %d", d2gsconf.adminport, WSAGetLastError());
 		return -1;
 	}
-	if (listen(mainsock,1)==-1) {
+	if (listen(mainsock, 1) == -1) {
 		closesocket(mainsock);
 		mainsock = -1;
 		D2GSEventLog("admin_service",
@@ -164,12 +165,12 @@ DWORD WINAPI admin_service(LPVOID lpParam)
 	}
 
 	/* admin service ok, loop for service request */
-	while(1)
+	while (1)
 	{
 		memset(&client, 0, sizeof(client));
 		clen = sizeof(client);
 		ns = accept(mainsock, (struct sockaddr *)&client, &clen);
-		if (ns<0) {
+		if (ns < 0) {
 			D2GSEventLog("admin_service",
 				"failed accept for admin socket. code: %d", WSAGetLastError());
 			tv.tv_sec = 1;
@@ -180,9 +181,9 @@ DWORD WINAPI admin_service(LPVOID lpParam)
 		temp.s_addr = client.sin_addr.s_addr;
 		ipaddr = ntohl(temp.s_addr);
 		ZeroMemory(ipstr, sizeof(ipstr));
-		strncpy(ipstr, inet_ntoa(temp), sizeof(ipstr)-1);
+		strncpy(ipstr, inet_ntoa(temp), sizeof(ipstr) - 1);
 
-		if (ipaddr==0) {
+		if (ipaddr == 0) {
 			closesocket(ns);
 			continue;
 		}
@@ -203,7 +204,7 @@ DWORD WINAPI admin_service(LPVOID lpParam)
 			SENDSTR(ns, "System error");
 			closesocket(ns);
 			continue;
-		} 
+		}
 		else
 			CloseHandle(hThread);
 	} /* End of while(1) */
@@ -229,32 +230,34 @@ DWORD WINAPI admin_thread(LPVOID *lpParam)
 		ns = *((int *)lpParam);
 
 	/* telnet option specifications */
-	sprintf(buf, "%c%c%c%c%c%c", 
-			TC_IAC, TC_WILL, TC_NOGA,	/* enable Go-Ahead option */
-			TC_IAC, TC_WILL, TC_ECHO);	/* enable Echo */
+	sprintf(buf, "%c%c%c%c%c%c",
+		TC_IAC, TC_WILL, TC_NOGA,	/* enable Go-Ahead option */
+		TC_IAC, TC_WILL, TC_ECHO);	/* enable Echo */
 	SENDSTR(ns, buf);
 	/* show logo info */
 	admin_logo(ns);
 
 	/* checking out password */
 	count = 3;
-	while(count>0)
+	while (count > 0)
 	{
 		strcpy(buf, "Password: ");
 		SENDSTR(ns, buf);
-		if (get_cmd_line(ns, recvbuf, 0)<0)	{
+		if (get_cmd_line(ns, recvbuf, 0) < 0) {
 			count = 0;
 			break;
 		}
 		i = admin_check_pass(recvbuf);
-		if (i<0) {
+		if (i < 0) {
 			strcpy(buf, "Sorry!\r\n");
 			SENDSTR(ns, buf);
 			count--;
-		} else if (i==0) {
+		}
+		else if (i == 0) {
 			SENDSTR(ns, "NULL password! For security, please set a password!!\r\n");
 			break;
-		} else
+		}
+		else
 			break;
 		if (admin_to_stop()) {
 			closesocket(ns);
@@ -265,7 +268,7 @@ DWORD WINAPI admin_thread(LPVOID *lpParam)
 		closesocket(ns);
 		return 0;
 	}
-	if (count==0) {
+	if (count == 0) {
 		/* retry for 3 times */
 		closesocket(ns);
 		return 0;
@@ -274,25 +277,25 @@ DWORD WINAPI admin_thread(LPVOID *lpParam)
 	SENDSTR(ns, buf);
 
 	/* if no password, tell to set one */
-	if (i==0) {
+	if (i == 0) {
 		strcpy(buf, "No password set!! For security, go to set one!\r\n\r\n");
 		SENDSTR(ns, buf);
 	}
 
 	/* entering loop wating for command */
-	while(1)
+	while (1)
 	{
 		strcpy(buf, "D2GS> ");
 		SENDSTR(ns, buf);
-		if ((count=get_cmd_line(ns, recvbuf, 1))<0) {
+		if ((count = get_cmd_line(ns, recvbuf, 1)) < 0) {
 			strcpy(buf, "\r\n\r\nTimeout!!\r\n\r\n");
 			SENDSTR(ns, buf);
 			break;
-		} 
+		}
 		if (admin_to_stop()) break;
-		if (count==0) continue;	// an empty line
+		if (count == 0) continue;	// an empty line
 		recvbuf[255] = 0;
-		if (admin_analyse_cmd(recvbuf, (u_char *)cmd, sizeof(cmd)/sizeof(cmd[0]), sizeof(cmd[0]))==0) {
+		if (admin_analyse_cmd(recvbuf, (u_char *)cmd, sizeof(cmd) / sizeof(cmd[0]), sizeof(cmd[0])) == 0) {
 			sprintf(buf, "'%s'\r\n", recvbuf);
 			strcat(buf, "Unknown command, please type \"help\" to get help.\r\n");
 			SENDSTR(ns, buf);
@@ -301,7 +304,7 @@ DWORD WINAPI admin_thread(LPVOID *lpParam)
 
 		/* to find which command it is */
 		i = 0;
-		while(admincmdtbl[i].keyword != NULL)
+		while (admincmdtbl[i].keyword != NULL)
 		{
 			if (strcmp(cmd[0], admincmdtbl[i].keyword) != 0) {
 				i++;
@@ -312,7 +315,8 @@ DWORD WINAPI admin_thread(LPVOID *lpParam)
 				strcpy(buf, "\r\nBye!\r\n");
 				SENDSTR(ns, buf);
 				i = 99999;
-			} else {
+			}
+			else {
 				admincmdtbl[i].adminfunc(ns, cmd[1]);
 			}
 			break;
@@ -344,12 +348,12 @@ int admin_analyse_cmd(u_char *buf, u_char *cmd, int x, int y)
 	u_char		*ptr, *pstr;
 
 	ptr = buf;
-	while(*ptr==' ' || *ptr=='\t') ptr++;
+	while (*ptr == ' ' || *ptr == '\t') ptr++;
 	pstr = ptr;
-	while(*ptr!=' ' && *ptr!='\t' && *ptr!='\0') ptr++;
+	while (*ptr != ' ' && *ptr != '\t' && *ptr != '\0') ptr++;
 	*ptr = '\0';
 	strcpy(cmd, pstr);
-	strcpy(cmd+y, ptr+1);
+	strcpy(cmd + y, ptr + 1);
 
 	return 1;
 
@@ -391,36 +395,38 @@ int get_cmd_line(unsigned int ns, unsigned char *buf, int flag)
 	ptr = buf;
 	count = 0;
 	timeoutcount = 0;
-	while(1)
+	while (1)
 	{
 		FD_ZERO(&rd);
 		FD_SET(ns, &rd);
 		tv.tv_sec = ADMIN_SESSION_TIMEOUT_UNIT;
 		tv.tv_usec = 0;
-		i = select(ns+1, &rd, NULL, NULL, &tv);
-		if (i<0) return -1;
-		if (i==0) {
+		i = select(ns + 1, &rd, NULL, NULL, &tv);
+		if (i < 0) return -1;
+		if (i == 0) {
 			timeoutcount++;
-			if (timeoutcount>=d2gsconf.admintimeout) return -1;
+			if (timeoutcount >= d2gsconf.admintimeout) return -1;
 			continue;
 		}
 		if (admin_to_stop()) return -1;
-		if ((bytes=recv(ns, mybuf, sizeof(mybuf), 0))<=0)
+		if ((bytes = recv(ns, mybuf, sizeof(mybuf), 0)) <= 0)
 			return -1;
 		timeoutcount = 0;
-		*(mybuf+bytes) = '\0';
+		*(mybuf + bytes) = '\0';
 		p = mybuf;
-		while(p<(mybuf+bytes))
+		while (p < (mybuf + bytes))
 		{
-			if ((*p=='\r')||(*p=='\n')||(*p=='\0'))	{
+			if ((*p == '\r') || (*p == '\n') || (*p == '\0')) {
 				*ptr = '\0';
 				strcpy(mybuf, "\r\n");
 				if (flag) SENDSTR(ns, mybuf);
 				return count;
-			} else if (*p==TC_IAC) {
+			}
+			else if (*p == TC_IAC) {
 				p += 3;
-			} else if ((*p==8)||(*p==127)) {		/* backspace */
-				if (count>0) {
+			}
+			else if ((*p == 8) || (*p == 127)) {		/* backspace */
+				if (count > 0) {
 					sprintf(tmp, "%c %c", 8, 8);
 					if (flag)
 						SENDSTR(ns, tmp);
@@ -428,11 +434,13 @@ int get_cmd_line(unsigned int ns, unsigned char *buf, int flag)
 					count--;
 				}
 				p++;
-			} else if ((*p<' ')||(*p>126)) {
+			}
+			else if ((*p < ' ') || (*p > 126)) {
 				p++;
-			} else {
+			}
+			else {
 				if (flag) SENDCHAR(ns, p);
-				if (count<255) {
+				if (count < 255) {
 					*(ptr++) = *(p++);
 					count++;
 				}
@@ -459,33 +467,36 @@ int admin_getchar(unsigned int ns)
 	DWORD			timeoutcount;
 
 	timeoutcount = 0;
-	while(1)
+	while (1)
 	{
 		FD_ZERO(&rd);
 		FD_SET(ns, &rd);
 		tv.tv_sec = ADMIN_SESSION_TIMEOUT_UNIT;
 		tv.tv_usec = 0;
-		i = select(ns+1, &rd, NULL, NULL, &tv);
-		if (i<0) return -1;
-		if (i==0) {
+		i = select(ns + 1, &rd, NULL, NULL, &tv);
+		if (i < 0) return -1;
+		if (i == 0) {
 			timeoutcount++;
-			if (timeoutcount>=d2gsconf.admintimeout) return -1;
+			if (timeoutcount >= d2gsconf.admintimeout) return -1;
 			continue;
 		}
 		if (admin_to_stop()) return -1;
-		if (recv(ns, buf, 1, 0)!=1)
+		if (recv(ns, buf, 1, 0) != 1)
 			return -1;
 		p = buf;
-		if ((*p=='\r')||(*p=='\n')) {
+		if ((*p == '\r') || (*p == '\n')) {
 			i = 13;		/* the return value */
 			break;
-		} else if (*p==27) {
+		}
+		else if (*p == 27) {
 			i = 27;
 			break;
-		} else if ((*p==8)||(*p==127)) {	/* backspace */
+		}
+		else if ((*p == 8) || (*p == 127)) {	/* backspace */
 			i = 8;
 			break;
-		} else if ((*p>=' ')&&(*p<=126)) {
+		}
+		else if ((*p >= ' ') && (*p <= 126)) {
 			i = *p;
 			break;
 		}
@@ -512,14 +523,14 @@ int admin_check_pass(unsigned char *pass)
 
 	if (!pass) return -1;
 
-	if ((pass[0]=='\0') && (d2gsconf.adminpwd[0]=='\0'))
+	if ((pass[0] == '\0') && (d2gsconf.adminpwd[0] == '\0'))
 		return 0;
 	if (bnet_hash(&hash, strlen(pass), pass) != 0)
 		return -1;
 	phash = hash_get_str(hash);
-	if (phash==NULL)
+	if (phash == NULL)
 		return -1;
-	if (strcmp(phash, d2gsconf.adminpwd)==0)
+	if (strcmp(phash, d2gsconf.adminpwd) == 0)
 		return 1;
 	else
 		return -1;
@@ -537,8 +548,8 @@ void admin_logo(unsigned int ns)
 	unsigned char	buf[512];
 
 	sprintf(buf, "%s%s%s%s%s%s",
-			"\r\nDiablo II Close Game Server Administration Console\r\n",
-			"Win32 Version ", VERNUM, ", build on ", BUILDDATE, "\r\n\r\n");
+		"\r\nDiablo II Close Game Server Administration Console\r\n",
+		"Win32 Version ", VERNUM, ", build on ", BUILDDATE, "\r\n\r\n");
 	SENDSTR(ns, buf);
 
 } /* End of admin_logo() */
@@ -558,10 +569,10 @@ void admin_help(unsigned int ns, u_char *param)
 	strcat(buf, "\r\nCommands help£º\r\n\r\n");
 	SENDSTR(ns, buf);
 	i = 0;
-	while(admincmdtbl[i].keyword != NULL)
+	while (admincmdtbl[i].keyword != NULL)
 	{
 		sprintf(buf, "%s %s\r\n  %s\r\n",
-				admincmdtbl[i].keyword, admincmdtbl[i].param, admincmdtbl[i].annotation);
+			admincmdtbl[i].keyword, admincmdtbl[i].param, admincmdtbl[i].annotation);
 		SENDSTR(ns, buf);
 		i++;
 	}
@@ -587,50 +598,52 @@ void admin_chgpasswd(unsigned int ns, u_char *param)
 	/* check old password */
 	SENDSTR(ns, "Changing login password:\r\n");
 	SENDSTR(ns, "current password: ");
-	if (get_cmd_line(ns, buf, 0)<0)
+	if (get_cmd_line(ns, buf, 0) < 0)
 		return;
-	if (admin_check_pass(buf)<=0) {
+	if (admin_check_pass(buf) <= 0) {
 		SENDSTR(ns, "\r\nUnauthorized operation!\r\n");
 		return;
 	}
 
 	/* input new password */
-	for(count=3; count>0; count--)
+	for (count = 3; count > 0; count--)
 	{
 		SENDSTR(ns, "\r\nnew password: ");
-		if (get_cmd_line(ns, buf, 0)<0)
+		if (get_cmd_line(ns, buf, 0) < 0)
 			return;
 		memset(newpass1, 0, sizeof(newpass1));
-		strncpy(newpass1, buf, sizeof(newpass1)-1);
+		strncpy(newpass1, buf, sizeof(newpass1) - 1);
 		SENDSTR(ns, "\r\nconfirm password: ");
-		if (get_cmd_line(ns, buf, 0)<0)
+		if (get_cmd_line(ns, buf, 0) < 0)
 			return;
 		memset(newpass2, 0, sizeof(newpass2));
-		strncpy(newpass2, buf, sizeof(newpass2)-1);
-		if (strcmp(newpass1, newpass2)==0) {
-			if (*newpass1=='\0') {
+		strncpy(newpass2, buf, sizeof(newpass2) - 1);
+		if (strcmp(newpass1, newpass2) == 0) {
+			if (*newpass1 == '\0') {
 				SENDSTR(ns, "\r\nSorry, password can't be null!\r\n");
 				continue;
-			} else
+			}
+			else
 				break;	/* can change the password now */
-		} else {
+		}
+		else {
 			SENDSTR(ns, "\r\nPassword mismatched!\r\n");
 			continue;
 		}
 	}
-	if (count==0) {
+	if (count == 0) {
 		SENDSTR(ns, "\r\nRetry for too many times, sorry!\r\n\r\n");
 		return;
 	}
 
 	/* save the new password */
 	SENDSTR(ns, "\r\n");
-	if (bnet_hash(&hash, strlen(newpass1), newpass1)!=0) {
+	if (bnet_hash(&hash, strlen(newpass1), newpass1) != 0) {
 		SENDSTR(ns, "Internal error!\r\n");
 		return;
 	}
 	ptr = hash_get_str(hash);
-	if (ptr==NULL) {
+	if (ptr == NULL) {
 		SENDSTR(ns, "Internal error2!\r\n");
 		return;
 	}
@@ -668,7 +681,7 @@ void admin_show_char_in_game(unsigned int ns, u_char *param)
 
 	if (!param) return;
 	GameId = (WORD)atoi(param);
-	if (GameId==0) {
+	if (GameId == 0) {
 		SENDSTR(ns, "Invalid game id\r\n\r\n");
 		return;
 	}
@@ -691,29 +704,30 @@ void admin_restart(unsigned int ns, u_char *param)
 	D2GSActive(FALSE);
 
 	if (param) {
-		if (stricmp(param, "force")==0) {
+		if (stricmp(param, "force") == 0) {
 			SENDSTR(ns, "Force restarting Diablo II Close Game Server!\r\n");
 			D2GSEventLog("admin_restart", "force restart d2gs by admin %u", ns);
 			CloseServerMutex();
 			ExitProcess(0);
 			return;
-		} else {
+		}
+		else {
 			delay = atoi(param);
-			if (delay==0)
+			if (delay == 0)
 				delay = DEFAULT_GS_SHUTDOWN_DELAY;
-			delay = (delay+d2gsconf.gsshutdowninterval-1)/d2gsconf.gsshutdowninterval;
+			delay = (delay + d2gsconf.gsshutdowninterval - 1) / d2gsconf.gsshutdowninterval;
 		}
 	}
 
 	D2GSEventLog("admin_restart", "restart d2gs by admin %u", ns);
-	while(delay)
+	while (delay)
 	{
 		sprintf(buf, "The game server will restart in %d seconds", delay*d2gsconf.gsshutdowninterval);
 		SENDSTR(ns, buf);
 		SENDSTR(ns, "\r\n");
 		chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buf);
 		delay--;
-		Sleep(d2gsconf.gsshutdowninterval*1000);
+		Sleep(d2gsconf.gsshutdowninterval * 1000);
 	}
 	D2GSEndAllGames();
 	Sleep(2000);
@@ -737,29 +751,30 @@ void admin_shutdown(unsigned int ns, u_char *param)
 	D2GSActive(FALSE);
 
 	if (param) {
-		if (param && stricmp(param, "force")==0) {
+		if (param && stricmp(param, "force") == 0) {
 			SENDSTR(ns, "Force shutdown Diablo II Close Game Server!\r\n");
 			D2GSEventLog("admin_shutdown", "force shutdown d2gs by admin %u", ns);
 			CloseServerMutex();
 			ExitProcess(1);
 			return;
-		} else {
+		}
+		else {
 			delay = atoi(param);
-			if (delay==0)
+			if (delay == 0)
 				delay = DEFAULT_GS_SHUTDOWN_DELAY;
-			delay = (delay+d2gsconf.gsshutdowninterval-1)/d2gsconf.gsshutdowninterval;
+			delay = (delay + d2gsconf.gsshutdowninterval - 1) / d2gsconf.gsshutdowninterval;
 		}
 	}
 
 	D2GSEventLog("admin_shutdown", "shutdown d2gs by admin %u", ns);
-	while(delay)
+	while (delay)
 	{
 		sprintf(buf, "The game server will shutdown in %d seconds", delay*d2gsconf.gsshutdowninterval);
 		SENDSTR(ns, buf);
 		SENDSTR(ns, "\r\n");
 		chat_message_announce_all(CHAT_MESSAGE_TYPE_SYS_MESSAGE, buf);
 		delay--;
-		Sleep(d2gsconf.gsshutdowninterval*1000);
+		Sleep(d2gsconf.gsshutdowninterval * 1000);
 	}
 	D2GSEndAllGames();
 	Sleep(2000);
@@ -781,14 +796,14 @@ void admin_uptime(unsigned int ns, u_char *param)
 	struct tm		*tm;
 
 	now = time(NULL);
-	interval = now-uptime;
+	interval = now - uptime;
 	tm = localtime(&uptime);
 	strftime(buf, sizeof(buf), "The game server started at %m-%d %H:%M:%S\r\n", tm);
 	SENDSTR(ns, buf);
 	tm = gmtime(&interval);
 	//strftime(buf, sizeof(buf), "uptime %d days %H hours %M minutes %S seconds\r\n", tm);
 	_snprintf(buf, sizeof(buf), "uptime %d days %d hours %d minutes %d seconds\r\n",
-			tm->tm_yday, tm->tm_hour, tm->tm_min, tm->tm_sec);
+		tm->tm_yday, tm->tm_hour, tm->tm_min, tm->tm_sec);
 	SENDSTR(ns, buf);
 	tm = localtime(&now);
 	strftime(buf, sizeof(buf), "Now it is %m-%d %H:%M:%S\r\n", tm);
@@ -810,10 +825,11 @@ void admin_setmaxgame(unsigned int ns, u_char *param)
 
 	if (!param) return;
 	maxgamenum = (DWORD)atoi(param);
-	if (maxgamenum>d2gsconf.gemaxgames) {
+	if (maxgamenum > d2gsconf.gemaxgames) {
 		sprintf(buf, "Maximum game number must be in range 0-%lu\r\n", d2gsconf.gemaxgames);
 		SENDSTR(ns, buf);
-	} else {
+	}
+	else {
 		D2GSSetD2CSMaxGameNumber(maxgamenum);
 		sprintf(buf, "Set maximum game number to %lu\r\n", maxgamenum);
 		SENDSTR(ns, buf);
@@ -822,7 +838,7 @@ void admin_setmaxgame(unsigned int ns, u_char *param)
 		else
 			sprintf(buf, "Set registry failed\r\n");
 		D2GSEventLog("admin_setmaxgame",
-				"Change max game number to %lu by admin %u", maxgamenum, ns);
+			"Change max game number to %lu by admin %u", maxgamenum, ns);
 		SENDSTR(ns, buf);
 	}
 	SENDSTR(ns, "\r\n");
@@ -841,7 +857,7 @@ void admin_disablegame(unsigned int ns, u_char *param)
 
 	if (!param) return;
 	GameId = (WORD)atoi(param);
-	if (GameId==0) {
+	if (GameId == 0) {
 		SENDSTR(ns, "Invalid game id\r\n\r\n");
 		return;
 	}
@@ -861,7 +877,7 @@ void admin_enablegame(unsigned int ns, u_char *param)
 
 	if (!param) return;
 	GameId = (WORD)atoi(param);
-	if (GameId==0) {
+	if (GameId == 0) {
 		SENDSTR(ns, "Invalid game id\r\n\r\n");
 		return;
 	}
@@ -881,7 +897,7 @@ void admin_setmaxgamelife(unsigned int ns, u_char *param)
 
 	if (!param) return;
 	gamelife = (DWORD)atoi(param);
-	if (gamelife==0) {
+	if (gamelife == 0) {
 		SENDSTR(ns, "Invalid value\r\n\r\n");
 		return;
 	}
@@ -927,7 +943,7 @@ void admin_getcharinfo(unsigned int ns, u_char *param)
 {
 	D2CHARINFO		*pCharInfo;
 
-	if (!param || *param=='\0') {
+	if (!param || *param == '\0') {
 		SENDSTR(ns, "Invalid char name\r\n");
 		return;
 	}
@@ -951,7 +967,7 @@ void admin_kick_user(unsigned int ns, u_char *param)
 	D2CHARINFO		*pCharInfo;
 	unsigned char	buf[64];
 
-	if (!param || *param=='\0') {
+	if (!param || *param == '\0') {
 		SENDSTR(ns, "Invalid char name\r\n");
 		return;
 	}
@@ -961,7 +977,7 @@ void admin_kick_user(unsigned int ns, u_char *param)
 		return;
 	}
 	D2GSSendClientChatMessage(pCharInfo->ClientId, CHAT_MESSAGE_TYPE_SYS_MESSAGE,
-			D2COLOR_ID_RED, NULL, "You were kicked out of the game by the administrator.");
+		D2COLOR_ID_RED, NULL, "You were kicked out of the game by the administrator.");
 	Sleep(1000);
 	D2GSRemoveClientFromGame(pCharInfo->ClientId);
 	sprintf(buf, "Char %s was kicked out\r\n", param);
@@ -975,7 +991,7 @@ void admin_kick_user(unsigned int ns, u_char *param)
  * Function: admin_getstatus
  * Return: None
  ************************************************************/
-typedef BOOL (WINAPI * GetProcessMemoryInfoFunc)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
+typedef BOOL(WINAPI * GetProcessMemoryInfoFunc)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
 void admin_getstatus(unsigned int ns, u_char *param)
 {
 	GetProcessMemoryInfoFunc	GetProcMem;
@@ -991,7 +1007,7 @@ void admin_getstatus(unsigned int ns, u_char *param)
 	D2GSNETSTATISTIC	netstat;
 
 	hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, GetCurrentProcessId());
-	if (!hProcess || (hProcess==INVALID_HANDLE_VALUE)) {
+	if (!hProcess || (hProcess == INVALID_HANDLE_VALUE)) {
 		SENDSTR(ns, "Can't get current process handle\r\n\r\n");
 		return;
 	}
@@ -1020,31 +1036,32 @@ void admin_getstatus(unsigned int ns, u_char *param)
 		if (GetProcMem) {
 			GetProcMem(hProcess, &psmem, sizeof(psmem));
 			sprintf(buf, "Physical memory usage: %7.3fMB/%7.3fMB\r\n",
-				psmem.WorkingSetSize/1048576.0, psmem.PeakWorkingSetSize/1048576.0);
+				psmem.WorkingSetSize / 1048576.0, psmem.PeakWorkingSetSize / 1048576.0);
 			SENDSTR(ns, buf);
 			sprintf(buf, "Virtual memory usage:  %7.3fMB/%7.3fMB\r\n",
-				psmem.PagefileUsage/1048576.0, psmem.PeakPagefileUsage/1048576.0);
+				psmem.PagefileUsage / 1048576.0, psmem.PeakPagefileUsage / 1048576.0);
 			SENDSTR(ns, buf);
 		}
 		FreeLibrary(hPsapi);
-	} else {
+	}
+	else {
 		SENDSTR(ns, "No meomory info while Psapi.dll unavailable\r\n");
 	}
 
 	QueryPerformanceFrequency(&freq);
-	if (freq.QuadPart==0) return;
+	if (freq.QuadPart == 0) return;
 	QueryPerformanceCounter(&start);
 	GetProcessTimes(hProcess, &ct, &et, &kt0, &ut0);
 	Sleep(100);
 	QueryPerformanceCounter(&end);
 	GetProcessTimes(hProcess, &ct, &et, &kt, &ut);
-	p0=(LONGLONG*)&kt0;	p=(LONGLONG*)&kt;
+	p0 = (LONGLONG*)&kt0;	p = (LONGLONG*)&kt;
 	sprintf(buf, "Kernel CPU usage: %6.2f%%\r\n",
-		(*p-*p0)*freq.QuadPart/(end.QuadPart-start.QuadPart)/1e5);
+		(*p - *p0)*freq.QuadPart / (end.QuadPart - start.QuadPart) / 1e5);
 	SENDSTR(ns, buf);
-	p0=(LONGLONG*)&ut0;	p=(LONGLONG*)&ut;
+	p0 = (LONGLONG*)&ut0;	p = (LONGLONG*)&ut;
 	sprintf(buf, "User CPU usage:   %6.2f%%\r\n",
-		(*p-*p0)*freq.QuadPart/(end.QuadPart-start.QuadPart)/1e5);
+		(*p - *p0)*freq.QuadPart / (end.QuadPart - start.QuadPart) / 1e5);
 	SENDSTR(ns, buf);
 	SENDSTR(ns, "\r\n");
 
@@ -1052,11 +1069,11 @@ void admin_getstatus(unsigned int ns, u_char *param)
 	D2GSGetNetStatistic(&netstat);
 	SENDSTR(ns, "Game Server Net Statistic: (rate is KBytes/second)\r\n");
 	SENDSTR(ns, "        RecvPkts    RecvBytes   SendPkts    SendBytes\r\n");
-	sprintf(buf,"D2CS  %10lu   %10lu %10lu   %10lu\r\n",
+	sprintf(buf, "D2CS  %10lu   %10lu %10lu   %10lu\r\n",
 		netstat.d2cs.recvpacket, netstat.d2cs.recvbytes,
 		netstat.d2cs.sendpacket, netstat.d2cs.sendbytes);
 	SENDSTR(ns, buf);
-	sprintf(buf,"D2DBS %10lu   %10lu %10lu   %10lu\r\n",
+	sprintf(buf, "D2DBS %10lu   %10lu %10lu   %10lu\r\n",
 		netstat.d2dbs.recvpacket, netstat.d2dbs.recvbytes,
 		netstat.d2dbs.sendpacket, netstat.d2dbs.sendbytes);
 	SENDSTR(ns, buf);
@@ -1093,29 +1110,29 @@ void admin_msg(unsigned int ns, u_char *param)
 	DWORD	dwMsgType;
 	int		ret;
 
-	if (!param || *param=='\0') {
+	if (!param || *param == '\0') {
 		SENDSTR(ns, "Invalid char name\r\n");
 		return;
 	}
 	argv = strtoargv(param, &argc);
-	if (argv==NULL) {
+	if (argv == NULL) {
 		SENDSTR(ns, "Internal error\r\n");
 		return;
 	}
-	if (argc!=3) {
+	if (argc != 3) {
 		SENDSTR(ns, "Invalid parameter\r\n");
 		return;
 	}
 
-	if (stricmp(argv[0], "SYS")==0)
+	if (stricmp(argv[0], "SYS") == 0)
 		dwMsgType = CHAT_MESSAGE_TYPE_SYS_MESSAGE;
-	else if (stricmp(argv[0], "C")==0)
+	else if (stricmp(argv[0], "C") == 0)
 		dwMsgType = CHAT_MESSAGE_TYPE_CHAT;
-	else if (stricmp(argv[0], "WT")==0)
+	else if (stricmp(argv[0], "WT") == 0)
 		dwMsgType = CHAT_MESSAGE_TYPE_WHISPER_TO;
-	else if (stricmp(argv[0], "WF")==0)
+	else if (stricmp(argv[0], "WF") == 0)
 		dwMsgType = CHAT_MESSAGE_TYPE_WHISPER_FROM;
-	else if (stricmp(argv[0], "SC")==0)
+	else if (stricmp(argv[0], "SC") == 0)
 		dwMsgType = CHAT_MESSAGE_TYPE_SCROLL;
 	else
 		dwMsgType = CHAT_MESSAGE_TYPE_SYS_MESSAGE;
@@ -1123,22 +1140,23 @@ void admin_msg(unsigned int ns, u_char *param)
 	string_color(argv[2]);
 
 	ret = -1;
-	switch(argv[1][0])
+	switch (argv[1][0])
 	{
 	case '#':
-		{
-			WORD	GameId;
-			if (stricmp(argv[1], "#all")==0) {
-				ret = chat_message_announce_all(dwMsgType, argv[2]);
-			} else {
-				GameId = (WORD)atoi(&argv[1][1]);
-				if (GameId==0)
-					SENDSTR(ns, "Invalid game id\r\n");
-				else 
-					ret = chat_message_announce_game(dwMsgType, GameId, argv[2]);
-			}
+	{
+		WORD	GameId;
+		if (stricmp(argv[1], "#all") == 0) {
+			ret = chat_message_announce_all(dwMsgType, argv[2]);
 		}
-		break;
+		else {
+			GameId = (WORD)atoi(&argv[1][1]);
+			if (GameId == 0)
+				SENDSTR(ns, "Invalid game id\r\n");
+			else
+				ret = chat_message_announce_game(dwMsgType, GameId, argv[2]);
+		}
+	}
+	break;
 	default:
 		ret = chat_message_announce_char(dwMsgType, argv[1], argv[2]);
 	}
@@ -1151,7 +1169,7 @@ void admin_msg(unsigned int ns, u_char *param)
 		SENDSTR(ns, "Success\r\n");
 
 	return;
- 
+
 } /* End of admin_msg() */
 
 

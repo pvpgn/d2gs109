@@ -11,7 +11,7 @@
 #include "d2gs.h"
 
 
-/* variales */
+ /* variales */
 extern D2GSCONFIGS			d2gsconf;
 extern BOOL					bGERunning;
 extern CRITICAL_SECTION		csGameList;

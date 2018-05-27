@@ -10,37 +10,37 @@
 
 #ifdef DEBUG
 
-static DWORD	gdwTotalCount=0;
+static DWORD	gdwTotalCount = 0;
 static BOOL		DebugDumpParam(LPCSTR lpName, DWORD dwValue);
 
 extern void DebugEventCallback(char const * module, int count, ...)
 {
 	SYSTEMTIME	st;
 	va_list		ap;
-	int		i,value;
+	int		i, value;
 	char		* name;
 	char		function[MAX_LINE_LEN];
 
 	if (!(d2gsconf.debugeventcallback)) return;
 
 	GetLocalTime(&st);
-	D2GEEventLog("DebugEventCallback","Event Called From Module \"%s\"",module);
-	fprintf(hexstrm,"%d: Checking Module \"%s\" (%d)\tTime:%d.%d.%d.%d\n",\
-			gdwTotalCount++,module,count,st.wHour,st.wMinute,\
-			st.wSecond,st.wMilliseconds);
-	sprintf (function,"%s(",module);
-	va_start(ap,count);
-	for (i=0; i<count; i++) {
-		name=va_arg(ap, char *);
-		value=va_arg(ap, int);
-		strcat(function,name);
-		if (i != count-1) strcat(function,", ");
-		DebugDumpParam(name,value);
+	D2GEEventLog("DebugEventCallback", "Event Called From Module \"%s\"", module);
+	fprintf(hexstrm, "%d: Checking Module \"%s\" (%d)\tTime:%d.%d.%d.%d\n", \
+		gdwTotalCount++, module, count, st.wHour, st.wMinute, \
+		st.wSecond, st.wMilliseconds);
+	sprintf(function, "%s(", module);
+	va_start(ap, count);
+	for (i = 0; i < count; i++) {
+		name = va_arg(ap, char *);
+		value = va_arg(ap, int);
+		strcat(function, name);
+		if (i != count - 1) strcat(function, ", ");
+		DebugDumpParam(name, value);
 	}
 	va_end(ap);
-	strcat(function,")");
-	fprintf(hexstrm,"Function: %s\n",function);
-	fprintf(hexstrm,"\n\n");
+	strcat(function, ")");
+	fprintf(hexstrm, "Function: %s\n", function);
+	fprintf(hexstrm, "\n\n");
 	fflush(hexstrm);
 	return;
 }
@@ -52,11 +52,12 @@ static BOOL DebugDumpParam(LPCSTR lpName, DWORD dwValue)
 
 	p = (void *)dwValue;
 	if (!hexstrm) return FALSE;
-	fprintf (hexstrm,"%s: 0x%08X write:%s ",lpName,dwValue,\
-		YESNO(!(IsBadWritePtr(p,sizeof(int)))));
-	if (!IsBadReadPtr(p,sizeof(int))) {
-		fprintf(hexstrm,"*%s=0x%08X\n",lpName,*(int *)p);
-	} else fprintf(hexstrm,"\n");
+	fprintf(hexstrm, "%s: 0x%08X write:%s ", lpName, dwValue, \
+		YESNO(!(IsBadWritePtr(p, sizeof(int)))));
+	if (!IsBadReadPtr(p, sizeof(int))) {
+		fprintf(hexstrm, "*%s=0x%08X\n", lpName, *(int *)p);
+	}
+	else fprintf(hexstrm, "\n");
 	if (!IsBadReadPtr(p, DEBUG_DUMPSIZE)) {
 		hexdump(p, DEBUG_DUMPSIZE);
 	}
@@ -77,7 +78,7 @@ extern void DebugNetPacket(D2GSPACKET *lpPacket)
 	sprintf(timestr, "    Time %d:%d:%d.%d",
 		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
-	switch(lpPacket->peer)
+	switch (lpPacket->peer)
 	{
 	case PACKET_PEER_RECV_FROM_D2CS:
 		fprintf(hexstrm, "From D2CS %d bytes:%s\n", lpPacket->datalen, timestr);
@@ -92,7 +93,7 @@ extern void DebugNetPacket(D2GSPACKET *lpPacket)
 		fprintf(hexstrm, "To D2DBS %d bytes:%s\n", lpPacket->datalen, timestr);
 		break;
 	}
-	if (lpPacket->datalen>0)
+	if (lpPacket->datalen > 0)
 		hexdump(lpPacket->data, lpPacket->datalen);
 	fprintf(hexstrm, "\n\n");
 	fflush(hexstrm);

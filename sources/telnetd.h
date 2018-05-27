@@ -27,7 +27,7 @@
 /* Types */
 typedef struct {
 	char	*keyword;
-	void	(*adminfunc)(unsigned int, u_char *);
+	void(*adminfunc)(unsigned int, u_char *);
 	char	*param;
 	char	*annotation;
 }  ADMINCOMMAND, *PADMINCOMMAND;

@@ -39,7 +39,8 @@ int D2GSTimerInitialize(void)
 	/* add to the cleanup routine list */
 	if (CleanupRoutineInsert(CleanupRoutineForTimer, "D2GS Timer")) {
 		return TRUE;
-	} else {
+	}
+	else {
 		/* do some cleanup before quiting */
 		CleanupRoutineForTimer();
 		return FALSE;
@@ -77,24 +78,27 @@ DWORD WINAPI D2GSTimerProcessor(LPVOID lpParameter)
 {
 	DWORD	dwWait;
 
-	while(TRUE)
+	while (TRUE)
 	{
 		dwWait = WaitForSingleObject(hStopEvent, TIMER_TICK_IN_MS);
-		if (dwWait==WAIT_FAILED) {
+		if (dwWait == WAIT_FAILED) {
 			D2GSEventLog("D2GSTimerProcessor",
 				"WaitForSingleObject failed. Code: %lu", GetLastError());
 			continue;
-		} else if (dwWait==WAIT_OBJECT_0) {
+		}
+		else if (dwWait == WAIT_OBJECT_0) {
 			/* stop event be set, quit */
 			D2GSEventLog("D2GSTimerProcessor", "Terminate timer thread");
 			return TRUE;
-		} else if (dwWait==WAIT_TIMEOUT) {
+		}
+		else if (dwWait == WAIT_TIMEOUT) {
 			/* a tick passed, call the routine to do something */
 			D2GSPendingCharTimerRoutine();
 			D2GSGetDataRequestTimerRoutine();
 			D2GSCalculateNetStatistic();
 			D2GSSendMOTD();
-		} else {
+		}
+		else {
 			continue;
 		}
 	}
