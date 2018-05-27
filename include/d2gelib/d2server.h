@@ -101,7 +101,7 @@ typedef struct
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern LPD2GSINTERFACE QueryInterface(VOID);
+extern __declspec(dllimport) LPD2GSINTERFACE QueryInterface(VOID);
 
 #ifdef __cplusplus
 }
